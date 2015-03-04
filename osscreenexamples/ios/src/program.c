@@ -15,38 +15,34 @@ void _entryPoint()
 	//OS functions
 	void(*_Exit)();
 	
-  /* IOS functions */
-  int (*IOS_Open)(unsigned char *path, int mode);
-  int (*IOS_Read)(int fd, char * buffer, int length);
-  
-  s32 (*IOS_Ioctl)(s32 fd, s32 request, void *buffer_in, s32 bytes_in, void *buffer_io, s32 bytes_io);
-  s32 (*IOS_Ioctlv)(s32 fd, s32 request, s32 InCount, s32 OutCont, void *vec);
+	/* IOS functions */
+	int (*IOS_Open)(unsigned char *path, int mode);
+	int (*IOS_Read)(int fd, char * buffer, int length);
+	
+	s32 (*IOS_Ioctl)(s32 fd, s32 request, void *buffer_in, s32 bytes_in, void *buffer_io, s32 bytes_io);
+	s32 (*IOS_Ioctlv)(s32 fd, s32 request, s32 InCount, s32 OutCont, void *vec);
 	/****************************>             Exports             <****************************/
 	//VPAD functions
 	OSDynLoad_FindExport(vpad_handle, 0, "VPADRead", &VPADRead);
 	//OS functions
 	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
 	
-	  OSDynLoad_FindExport(coreinit_handle, 0, "IOS_Open", &IOS_Open);
-  OSDynLoad_FindExport(coreinit_handle, 0, "IOS_Read", &IOS_Read);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IOS_Open", &IOS_Open);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IOS_Read", &IOS_Read);
+	
+	OSDynLoad_FindExport(coreinit_handle, 0, "IOS_Ioctl", &IOS_Ioctl);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IOS_Ioctlv", &IOS_Ioctlv);
   
-  OSDynLoad_FindExport(coreinit_handle, 0, "IOS_Ioctl", &IOS_Ioctl);
-  OSDynLoad_FindExport(coreinit_handle, 0, "IOS_Ioctlv", &IOS_Ioctlv);
-  
-        void (*OSConsoleWrite)(u32 address, u32 length);
-	  void (*OSLogRetrieve)(u32 flags, u32 dest, u32 length);
-	  OSDynLoad_FindExport(coreinit_handle, 0, "OSConsoleWrite", &OSConsoleWrite);
-	  OSDynLoad_FindExport(coreinit_handle, 0, "OSLogRetrieve", &OSLogRetrieve);
-	    /* OS exception functions */
-  char (*OSSetExceptionCallback)(unsigned char ex, char (*callback)(void*));
-  /* Read the address of OSSetExceptionCallback() */
-  OSDynLoad_FindExport(coreinit_handle, 0, "OSSetExceptionCallback", &OSSetExceptionCallback);
+	/* OS exception functions */
+	char (*OSSetExceptionCallback)(unsigned char ex, char (*callback)(void*));
+	/* Read the address of OSSetExceptionCallback() */
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSSetExceptionCallback", &OSSetExceptionCallback);
 	/****************************>             Globals             <****************************/
 	
 	  /* Set up DSI, ISI, and program exception callbacks */
-  OSSetExceptionCallback(2, &ex_cb);
-  OSSetExceptionCallback(3, &ex_cb);
-  OSSetExceptionCallback(6, &ex_cb);
+	OSSetExceptionCallback(2, &ex_cb);
+	OSSetExceptionCallback(3, &ex_cb);
+	OSSetExceptionCallback(6, &ex_cb);
 	struct renderFlags flags;
 	flags.y=0;
 	flags.x=0;
@@ -77,10 +73,6 @@ void _entryPoint()
 	VPADStatus vpad_status;
 	//Read initial vpad status
 	VPADRead(0, &vpad_status, 1, &error);
-	unsigned int (*OSScreenPutPixelEx)(unsigned int bufferNum, unsigned int posX, unsigned int posY, u32 color);
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenPutPixelEx", &OSScreenPutPixelEx);
-		unsigned int(*OSScreenSetBufferEx)(unsigned int bufferNum, void * addr);
-		OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenSetBufferEx", &OSScreenSetBufferEx);
 	while(1)
 	{
 		VPADRead(0, &vpad_status, 1, &error);
