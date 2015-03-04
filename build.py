@@ -19,6 +19,7 @@ def main():
 	projectDir=rootDir+"\\"+ar1
 	platformStr=platform.system().lower()
 	print("Building for your "+platformStr+" platform...")
+	os.mkdir(wwwDir)
 	os.chdir(frameworkDir)
 	os.system("Make")
 	os.chdir(libsDir)

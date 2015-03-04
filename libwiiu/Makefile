@@ -1,8 +1,12 @@
 root	:= $(CURDIR)
 project := $(CURDIR)/src
 build	:=	 $(root)/bin
-all: libwiiu500 libwiiu410 libwiiu400
+all: setup libwiiu500 libwiiu410 libwiiu400
 
+setup:
+	mkdir -p $(root)/bin/500/
+	mkdir -p $(root)/bin/410/
+	mkdir -p $(root)/bin/400/
 libwiiu500:
 	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=500 -c $(project)/*.c 
 	#-Wa,-a,-ad

@@ -1,7 +1,9 @@
 root:=$(CURDIR)
 project	:=	$(root)/src
 build	:=	 $(root)/bin
-all: findcode500 findcode410 findcode400
+all: setup findcode500 findcode410 findcode400
+setup:
+	mkdir -p $(root)/bin
 findcode500:
 ifeq ("$(wildcard $(build)/findcode500.bin)","")
 	# Build findcode
