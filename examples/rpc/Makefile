@@ -1,6 +1,7 @@
 project	:=	src
 root:=$(CURDIR)
 build	:=	 $(root)/bin
+libs := $(root)/../../libwiiu/bin
 www :=$(root)/../../www
 framework:=$(root)/../../framework
 all: main500 main410 main400
@@ -10,18 +11,18 @@ main500:
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
-	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code500.bin $(build)/loader.o `find $(build) -name "*.o" ! -name "loader.o"`
+	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code500.bin $(build)/loader.o $(libs)/500/*.o `find $(build) -name "*.o" ! -name "loader.o"`
 main410:
 	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=410 -c $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
-	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code410.bin $(build)/loader.o `find $(build) -name "*.o" ! -name "loader.o"`
+	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code410.bin $(build)/loader.o $(libs)/410/*.o `find $(build) -name "*.o" ! -name "loader.o"`
 main400:
 	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=400 -c $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
-	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code400.bin $(build)/loader.o `find $(build) -name "*.o" ! -name "loader.o"`
+	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code400.bin $(build)/loader.o $(libs)/400/*.o `find $(build) -name "*.o" ! -name "loader.o"`
 clean:
 	rm -r $(build)/*

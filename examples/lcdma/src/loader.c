@@ -138,14 +138,6 @@ void _start()
 	OSFreeToSystem(src_addr);
     OSFatal(output);
 }
-int strlen(char *str)
-{
-	const char *s;
-
-	for (s = str; *s; ++s)
-		;
-	return (s - str);
-}
 /*
 coreinit.rpl LCStoreDMABlocks
 

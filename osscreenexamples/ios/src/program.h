@@ -5,8 +5,6 @@
 #include "../../../libwiiu/src/types.h"
 #include "../../../libwiiu/src/draw.h"
 
-#include "../../../libwiiu/src/loader.h"
-
 struct renderFlags{
 int y;
 int x;

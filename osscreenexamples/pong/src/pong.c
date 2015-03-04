@@ -339,12 +339,10 @@ void renderWin(struct pongGlobals *myPongGlobals) {
 		char p1win[255];
 		__os_snprintf(p1win, 255, "Player 1 Wins!");
 		drawString(myPongGlobals->winX, myPongGlobals->winY, p1win);
-		drawString(myPongGlobals->winX, myPongGlobals->winY, p1win);
 	}
 	if (myPongGlobals->winningPlayer == 2) {
 		char p2win[255];
 		__os_snprintf(p2win, 255, "Player 2 Wins!");
-		drawString(myPongGlobals->winX, myPongGlobals->winY, p2win);
 		drawString(myPongGlobals->winX, myPongGlobals->winY, p2win);
 	}
 };
@@ -355,6 +353,10 @@ void renderInitialPlayers(struct pongGlobals *myPongGlobals) {
 	
 	drawFillRect(myPongGlobals->p2X_old, myPongGlobals->p2Y_old - myPongGlobals->p2Y_size, myPongGlobals->p2X_old + myPongGlobals->p2X_size, myPongGlobals->p2Y_old, myPongGlobals->paddleColorR, myPongGlobals->paddleColorG, myPongGlobals->paddleColorB, 0);
 	drawFillRect(myPongGlobals->ballX_old, myPongGlobals->ballY_old - myPongGlobals->ballY_size, myPongGlobals->ballX_old + myPongGlobals->ballX_size, myPongGlobals->ballY_old, myPongGlobals->ballColorR, myPongGlobals->ballColorG, myPongGlobals->ballColorB, 0);
+	
+	char credits[255];
+	__os_snprintf(credits, 255, "Pong by Relys!");
+	drawString(myPongGlobals->winX, myPongGlobals->winY+1, credits);
 };
 
 //Draws player1's paddle

@@ -4,8 +4,8 @@
 #include "../../../libwiiu/src/coreinit.h"
 #include "../../../libwiiu/src/types.h"
 #include "../../../libwiiu/src/socket.h"
+#include "../../../libwiiu/src/string.h"
 
-int strlen(char *str);
 
 void _start();
 
