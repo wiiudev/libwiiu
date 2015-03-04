@@ -4,8 +4,9 @@ build	:=	 $(root)/bin
 libs := $(root)/../../libwiiu/bin
 www :=$(root)/../../www
 framework:=$(root)/../../framework
-all: main500 main410 main400
-
+all: setup main500 main410 main400
+setup:
+	mkdir -p $(root)/bin
 main500:
 	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=500 -c $(project)/*.c
 	#-Wa,-a,-ad
