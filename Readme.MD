@@ -17,7 +17,7 @@ This repository contains a C build system, which allows you to compile your own 
 * Python 3.x
 
 #### Build Example ####
-The examples folder contains projects using OSScreen. The oldexamples folder don't use OSScreen.
+The osscreenexamples folder contains projects using OSScreen and the loader.c from libwiiu. The examples folder does not use OSScreen and uses the loader.c in the projects local directory.
 * python build.py <project path>
 * python build.py osscreenexamples/template
 
