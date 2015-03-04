@@ -45,33 +45,7 @@ void _start()
 	OSDynLoad_FindExport(coreinit_handle, 0, "LCLoadDMABlocks", &LCLoadDMABlocks);
 	OSDynLoad_FindExport(coreinit_handle, 0, "LCStoreDMABlocks", &LCStoreDMABlocks);
 	OSDynLoad_FindExport(coreinit_handle, 0, "LCWaitDMAQueue", &LCWaitDMAQueue);
-	
-	/*
-	u32 nsysnet_handle;
-	OSDynLoad_Acquire("nsysnet.rpl", &nsysnet_handle);
-	int (*socket)(int family, int type, int proto);
-	int (*connect)(int fd, struct sockaddr *addr, int addrlen);
-	int (*send)(int fd, const void *buffer, int len, int flags);
-	OSDynLoad_FindExport(nsysnet_handle, 0, "socket", &socket);
-	OSDynLoad_FindExport(nsysnet_handle, 0, "connect", &connect);
-	OSDynLoad_FindExport(nsysnet_handle, 0, "send", &send);
-
-	
-	struct sockaddr sin;
-	sin.sin_family = AF_INET;
-	sin.sin_port = 12345;
-	sin.sin_addr.s_addr = PC_IP;
-	int i;
-	for (i = 0; i < 8; i++)
-	{
-		sin.sin_zero[i] = 0;
-	}
-	int rpc = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	int status = connect(rpc, &sin, 0x10);
-	if (status) _Exit();
-	//send(rpc, "Failure", 8, 0);
-	*/
-	
+		
 	//Used for keeping track of vairables to print to screen
 	char output[1000];
 	
