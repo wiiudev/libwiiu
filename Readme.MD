@@ -19,7 +19,7 @@ This repository contains a C build system, which allows you to compile your own 
 #### Build Example ####
 The examples folder contains projects using OSScreen. The oldexamples folder don't use OSScreen.
 * python build.py <project path>
-* python build.py examples/template
+* python build.py osscreenexamples/template
 
 #### Accessing the SDK libraries ####
 
