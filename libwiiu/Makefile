@@ -1,3 +1,5 @@
+CC=powerpc-eabi-gcc
+CFLAGS=-nostdinc -fno-builtin -c
 root	:= $(CURDIR)
 project := $(CURDIR)/src
 build	:=	 $(root)/bin
@@ -8,17 +10,17 @@ setup:
 	mkdir -p $(root)/bin/410/
 	mkdir -p $(root)/bin/400/
 libwiiu500:
-	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=500 -c $(project)/*.c 
+	$(CC) $(CFLAGS) -DVER=500  $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)/500
 	rm $(root)/*.o
 libwiiu410:
-	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=410 -c $(project)/*.c 
+	$(CC) $(CFLAGS) -DVER=410 $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)/410
 	rm $(root)/*.o
 libwiiu400:
-	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=400 -c $(project)/*.c 
+	$(CC) $(CFLAGS) -DVER=400 $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)/400
 	rm $(root)/*.o

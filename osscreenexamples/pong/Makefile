@@ -1,3 +1,7 @@
+CC=powerpc-eabi-gcc
+CFLAGS=-nostdinc -fno-builtin
+LD=powerpc-eabi-ld
+LDFLAGS=-Ttext 1800000 --oformat binary
 project	:=	src
 root:=$(CURDIR)
 build	:=	 $(root)/bin
@@ -8,22 +12,22 @@ all: setup main500 main410 main400
 setup:
 	mkdir -p $(root)/bin
 main500:
-	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=500 -c $(project)/*.c
+	$(CC) $(CFLAGS) -DVER=500 $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
-	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code500.bin $(build)/loader.o `find $(libs)/500/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
+	$(LD) $(LDFLAGS) -o $(build)/code500.bin $(build)/loader.o `find $(libs)/500/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
 main410:
-	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=410 -c $(project)/*.c
+	$(CC) $(CFLAGS) -DVER=410 $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
-	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code410.bin $(build)/loader.o `find $(libs)/410/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
+	$(LD) $(LDFLAGS) -o $(build)/code410.bin $(build)/loader.o `find $(libs)/410/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
 main400:
-	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=400 -c $(project)/*.c
+	$(CC) $(CFLAGS) -DVER=400 $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
-	powerpc-eabi-ld -Ttext 1800000 --oformat binary -o $(build)/code400.bin $(build)/loader.o `find $(libs)/400/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
+	$(LD) $(LDFLAGS) -o $(build)/code400.bin $(build)/loader.o `find $(libs)/400/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
 clean:
 	rm -r $(build)/*
