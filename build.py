@@ -19,17 +19,21 @@ def main():
 	projectDir=os.path.join(rootDir,ar1)
 	platformStr=platform.system().lower()
 	print("Building for your "+platformStr+" platform...")
-        if not os.path.exists(wwwDir):
+	if not os.path.exists(wwwDir):
 	    os.mkdir(wwwDir)
 	os.chdir(frameworkDir)
-	os.system("make")
+	subprocess.call(['make'])
 	os.chdir(libsDir)
-	os.system("make")
+	subprocess.call(['make'])
 	os.chdir(projectDir)
-	os.system("make")
-	os.system("python "+frameworkDir+"/generate_html.py "+projectDir+"/bin/code"+str(500)+".bin "+str(500)+" "+wwwDir)
-	os.system("python "+frameworkDir+"/generate_html.py "+projectDir+"/bin/code"+str(410)+".bin "+str(410)+" "+wwwDir)
-	os.system("python "+frameworkDir+"/generate_html.py "+projectDir+"/bin/code"+str(400)+".bin "+str(400)+" "+wwwDir)
+	subprocess.call(['make'])
+	gen_html = os.path.join(frameworkDir, 'generate_html.py')
+	code500 = os.path.join(projectDir, 'bin', 'code') + str(500) + '.bin'
+	code410 = os.path.join(projectDir, 'bin', 'code') + str(500) + '.bin'
+	code400 = os.path.join(projectDir, 'bin', 'code') + str(500) + '.bin'
+	subprocess.call(['python', gen_html, code500, str(500), wwwDir])
+	subprocess.call(['python', gen_html, code410, str(410), wwwDir])
+	subprocess.call(['python', gen_html, code400, str(400), wwwDir])
 
 if __name__ == '__main__':
 	main()
