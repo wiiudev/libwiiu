@@ -1,5 +1,5 @@
 CC=powerpc-eabi-gcc
-CFLAGS=-nostdinc -fno-builtin
+CFLAGS=-nostdinc -fno-builtin -c
 LD=powerpc-eabi-ld
 LDFLAGS=-Ttext 1800000 --oformat binary
 project	:=	src
@@ -10,7 +10,7 @@ www :=$(root)/../../www
 framework:=$(root)/../../framework
 all: setup main500 main410 main400
 setup:
-	mkdir -p $(root)/bin
+	mkdir -p $(root)/bin/
 main500:
 	$(CC) $(CFLAGS) -DVER=500 $(project)/*.c
 	#-Wa,-a,-ad
