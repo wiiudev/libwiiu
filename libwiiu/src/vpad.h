@@ -1,78 +1,52 @@
 #ifndef VPAD_H
 #define VPAD_H
 
-#define KEY_LEFT	0x0800
-#define KEY_RIGHT	0x0400
-#define KEY_UP		0x0200
-#define KEY_DOWN	0x0100
-#define KEY_A		0x8000
-#define KEY_B		0x4000
-#define KEY_X		0x2000
-#define KEY_Y		0x1000
-#define KEY_ZR		0x0040
-#define KEY_ZL		0x0080
-#define KEY_R		0x0010
-#define KEY_L		0x0020
-#define KEY_PLUS	0x0008
-#define KEY_MINUS	0x0004
-#define KEY_SYNC	0x0001
-#define KEY_POWER	0x0002
-#define KEY_HOME	0x0002
+#include "types.h"
 
-typedef struct Vec
-{
-	unsigned int x;
-} Vec;
+#define BUTTON_A        0x8000
+#define BUTTON_B        0x4000
+#define BUTTON_X        0x2000
+#define BUTTON_Y        0x1000
+#define BUTTON_LEFT     0x0800
+#define BUTTON_RIGHT    0x0400
+#define BUTTON_UP       0x0200
+#define BUTTON_DOWN     0x0100
+#define BUTTON_ZL       0x0080
+#define BUTTON_ZR       0x0040
+#define BUTTON_L        0x0020
+#define BUTTON_R        0x0010
+#define BUTTON_PLUS     0x0008
+#define BUTTON_MINUS    0x0004
+#define BUTTON_HOME     0x0002
+#define BUTTON_SYNC     0x0001
 
-typedef struct Vec2
+typedef struct
 {
-	unsigned int x, y;
-} Vec2;
+    float x,y;
+} Vec2D;
 
-typedef struct VPADDir
+typedef struct
 {
-	Vec X;
-	Vec Y;
-	Vec Z;
-} VPADDir;
-
-typedef struct VPADTPData
-{
-	unsigned short x, y;
-	unsigned short touch;
-	unsigned short validity;
+    uint16_t x, y;               /* Touch coordinates */
+    uint16_t touched;            /* 1 = Touched, 0 = Not touched */
+    uint16_t validity;           /* 0 = All valid, 1 = X invalid, 2 = Y invalid, 3 = Both invalid? */
 } VPADTPData;
-
-typedef struct VPADStatus
+ 
+typedef struct
 {
-	unsigned int hold;
-	unsigned int press;
-	unsigned int release;
+    uint32_t btn_hold;           /* Held buttons */
+    uint32_t btn_trigger;        /* Buttons that are pressed at that instant */
+    uint32_t btn_release;        /* Released buttons */
+    Vec2D lstick, rstick;        /* Each contains 4-byte X and Y components */
+    char unknown1c[0x52 - 0x1c]; /* Contains accelerometer and gyroscope data somewhere */
+    VPADTPData tpdata;           /* Normal touchscreen data */
+    VPADTPData tpdata1;          /* Modified touchscreen data 1 */
+    VPADTPData tpdata2;          /* Modified touchscreen data 2 */
+    char unknown6a[0xa0 - 0x6a];
+    uint8_t volume;
+    uint8_t battery;             /* 0 to 6 */
+    uint8_t unk_volume;          /* One less than volume */
+    char unknowna4[0xac - 0xa4];
+} VPADData;
 
-	Vec2 left_stick;
-	Vec2 right_stick;
-
-	Vec acceleration;
-	float acceleration_value;
-	float acceleration_speed;
-
-	Vec angular_velocity;
-	Vec rotational_velocity;
-
-	char error;
-
-	VPADTPData touch_data;
-	VPADTPData drawing_touch_data;
-	VPADTPData moving_touch_data;
-
-	VPADDir direction;
-
-	char headphones;
-
-	Vec magnet;
-	unsigned char volume;
-	unsigned char battery;
-	unsigned char mic;
-	unsigned short padding[8];
-} VPADStatus;
 #endif /* VPAD_H */

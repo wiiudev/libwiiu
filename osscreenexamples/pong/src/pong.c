@@ -24,7 +24,7 @@ int collisionBox(int box1x, int box1y, int width1, int height1, int box2x, int b
 //Updates player1 location
 void p1Move(struct pongGlobals *myPongGlobals) {
 	
-	if ((myPongGlobals->button & KEY_LEFT) && myPongGlobals->p1X > myPongGlobals->xMinBoundry) {
+	if ((myPongGlobals->button & BUTTON_LEFT) && myPongGlobals->p1X > myPongGlobals->xMinBoundry) {
 
 		//Trigger render flag
 		myPongGlobals->renderP1Flag = 1;
@@ -34,14 +34,14 @@ void p1Move(struct pongGlobals *myPongGlobals) {
 
 	}
 		
-	if ((myPongGlobals->button & KEY_RIGHT) && myPongGlobals->p1X+myPongGlobals->p1X_size < myPongGlobals->xMaxBoundry/4) {
+	if ((myPongGlobals->button & BUTTON_RIGHT) && myPongGlobals->p1X+myPongGlobals->p1X_size < myPongGlobals->xMaxBoundry/4) {
 
 		myPongGlobals->p1X++;
 		//Trigger render flag
 		myPongGlobals->renderP1Flag = 1;
 	}
 	
-	if ((myPongGlobals->button & KEY_UP) && myPongGlobals->p1Y-myPongGlobals->p1Y_size > myPongGlobals->yMinBoundry) {
+	if ((myPongGlobals->button & BUTTON_UP) && myPongGlobals->p1Y-myPongGlobals->p1Y_size > myPongGlobals->yMinBoundry) {
 
 		//Trigger render flag
 		myPongGlobals->renderP1Flag = 1;
@@ -50,7 +50,7 @@ void p1Move(struct pongGlobals *myPongGlobals) {
 		myPongGlobals->p1Y--;
 
 	}
-	if ((myPongGlobals->button & KEY_DOWN) && myPongGlobals->p1Y < myPongGlobals->yMaxBoundry) {
+	if ((myPongGlobals->button & BUTTON_DOWN) && myPongGlobals->p1Y < myPongGlobals->yMaxBoundry) {
 
 		myPongGlobals->p1Y++;
 		//Trigger render flag
@@ -62,7 +62,7 @@ void p1Move(struct pongGlobals *myPongGlobals) {
 //Updates player1 location
 void p2Move(struct pongGlobals *myPongGlobals) {
 	
-	if ((myPongGlobals->button & KEY_Y) && myPongGlobals->p2X > myPongGlobals->xMaxBoundry-myPongGlobals->xMaxBoundry/4) {
+	if ((myPongGlobals->button & BUTTON_Y) && myPongGlobals->p2X > myPongGlobals->xMaxBoundry-myPongGlobals->xMaxBoundry/4) {
 
 		//Trigger render flag
 		myPongGlobals->renderP2Flag = 1;
@@ -72,14 +72,14 @@ void p2Move(struct pongGlobals *myPongGlobals) {
 
 	}
 		
-	if ((myPongGlobals->button & KEY_A) && myPongGlobals->p2X+myPongGlobals->p2X_size < myPongGlobals->xMaxBoundry) {
+	if ((myPongGlobals->button & BUTTON_A) && myPongGlobals->p2X+myPongGlobals->p2X_size < myPongGlobals->xMaxBoundry) {
 
 		myPongGlobals->p2X++;
 		//Trigger render flag
 		myPongGlobals->renderP2Flag = 1;
 	}
 	
-	if ((myPongGlobals->button & KEY_X) && myPongGlobals->p2Y-myPongGlobals->p2Y_size > myPongGlobals->yMinBoundry) {
+	if ((myPongGlobals->button & BUTTON_X) && myPongGlobals->p2Y-myPongGlobals->p2Y_size > myPongGlobals->yMinBoundry) {
 
 		//Trigger render flag
 		myPongGlobals->renderP2Flag = 1;
@@ -88,7 +88,7 @@ void p2Move(struct pongGlobals *myPongGlobals) {
 		myPongGlobals->p2Y--;
 
 	}
-	if ((myPongGlobals->button & KEY_B) && myPongGlobals->p2Y < myPongGlobals->yMaxBoundry) {
+	if ((myPongGlobals->button & BUTTON_B) && myPongGlobals->p2Y < myPongGlobals->yMaxBoundry) {
 
 		myPongGlobals->p2Y++;
 		//Trigger render flag

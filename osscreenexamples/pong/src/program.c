@@ -11,7 +11,7 @@ void _entryPoint()
 	OSDynLoad_Acquire("vpad.rpl", &vpad_handle);
 	/****************************>       External Prototypes       <****************************/
 	//VPAD functions
-	int(*VPADRead)(int controller, VPADStatus *buffer, unsigned int num, int *error);
+	int(*VPADRead)(int controller, VPADData *buffer, unsigned int num, int *error);
 	//OS functions
 	void(*_Exit)();
 	/****************************>             Exports             <****************************/
@@ -102,12 +102,12 @@ void _entryPoint()
 	myPongGlobals.renderScoreFlag = 0;
 	/****************************>            VPAD Loop            <****************************/
 	int error;
-	VPADStatus vpad_status;
+	VPADData vpad_data;
 	while (1)
 	{
-		VPADRead(0, &vpad_status, 1, &error);
+		VPADRead(0, &vpad_data, 1, &error);
 		//Get the status of the gamepad
-		myPongGlobals.button = vpad_status.hold;
+		myPongGlobals.button = vpad_data.btn_hold;
 		//If the game has been restarted, reset the game (we do this one time in the beginning to set everything up)
 		if (myPongGlobals.restart == 1)
 		{
@@ -133,7 +133,7 @@ void _entryPoint()
 		myPongGlobals.count+=1;
 
 		//To exit the game
-		if (myPongGlobals.button&KEY_HOME)
+		if (myPongGlobals.button&BUTTON_HOME)
 		{
 		break;
 		}

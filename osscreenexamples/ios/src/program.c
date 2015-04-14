@@ -11,7 +11,7 @@ void _entryPoint()
 	OSDynLoad_Acquire("vpad.rpl", &vpad_handle);
 	/****************************>       External Prototypes       <****************************/
 	//VPAD functions
-	int(*VPADRead)(int controller, VPADStatus *buffer, unsigned int num, int *error);
+	int(*VPADRead)(int controller, VPADData *buffer, unsigned int num, int *error);
 	//OS functions
 	void(*_Exit)();
 	
@@ -70,15 +70,15 @@ void _entryPoint()
 	int blah=0;
 	/* Enter the VPAD loop */
 	int error;
-	VPADStatus vpad_status;
+	VPADData vpad_data;
 	//Read initial vpad status
-	VPADRead(0, &vpad_status, 1, &error);
+	VPADRead(0, &vpad_data, 1, &error);
 	while(1)
 	{
-		VPADRead(0, &vpad_status, 1, &error);
+		VPADRead(0, &vpad_data, 1, &error);
 
 		//button A
-		if (vpad_status.hold & KEY_A)
+		if (vpad_data.btn_hold & BUTTON_A)
 		{
 			flags.y=0;
 			flags.x=0;
@@ -89,7 +89,7 @@ void _entryPoint()
 		}
 	
 		//button B
-		else if (vpad_status.hold & KEY_B)
+		else if (vpad_data.btn_hold & BUTTON_B)
 		{
 			flags.y=0;
 			flags.x=0;
@@ -98,7 +98,7 @@ void _entryPoint()
 		}
 	
 		//button X
-		else if (vpad_status.hold & KEY_X)
+		else if (vpad_data.btn_hold & BUTTON_X)
 		{
 			flags.y=0;
 			flags.x=1;
@@ -108,7 +108,7 @@ void _entryPoint()
 		}
 	
 		//button Y
-		else if (vpad_status.hold & KEY_Y)
+		else if (vpad_data.btn_hold & BUTTON_Y)
 		{
 			flags.y=1;
 			flags.x=0;
@@ -117,7 +117,7 @@ void _entryPoint()
 			__os_snprintf(flags.output, 1000, "Y button pressed");
 		}
 		
-		if(vpad_status.hold & KEY_HOME)
+		if(vpad_data.btn_hold & BUTTON_HOME)
 		{
 		break;
 		}
