@@ -19,8 +19,8 @@ void _entryPoint()
 	int (*IOS_Open)(unsigned char *path, int mode);
 	int (*IOS_Read)(int fd, char * buffer, int length);
 	
-	s32 (*IOS_Ioctl)(s32 fd, s32 request, void *buffer_in, s32 bytes_in, void *buffer_io, s32 bytes_io);
-	s32 (*IOS_Ioctlv)(s32 fd, s32 request, s32 InCount, s32 OutCont, void *vec);
+	int32_t (*IOS_Ioctl)(int32_t fd, int32_t request, void *buffer_in, int32_t bytes_in, void *buffer_io, int32_t bytes_io);
+	int32_t (*IOS_Ioctlv)(int32_t fd, int32_t request, int32_t InCount, int32_t OutCont, void *vec);
 	/****************************>             Exports             <****************************/
 	//VPAD functions
 	OSDynLoad_FindExport(vpad_handle, 0, "VPADRead", &VPADRead);

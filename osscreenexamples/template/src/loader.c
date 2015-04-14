@@ -22,7 +22,7 @@ void _start()
 	//Misc OS functions
 	void(*OSRestartGame)();
 	//OS Memory functions
-	void(*DCFlushRange)(void *buffer, u32 length);
+	void(*DCFlushRange)(void *buffer, uint32_t length);
 	/****************************>             Exports             <****************************/
 	//OSScreen functions
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenInit", &OSScreenInit);

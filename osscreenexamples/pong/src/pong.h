@@ -57,7 +57,7 @@ struct pongGlobals{
 
 	//Game engine globals
 	int direction;
-	u32 button;
+	uint32_t button;
 	int paddleColorR;
 	int paddleColorG;
 	int paddleColorB;

@@ -1,5 +1,5 @@
 CC=powerpc-eabi-gcc
-CFLAGS=-ffreestanding -fno-builtin -c
+CFLAGS=-nostdinc -fno-builtin -c
 root	:= $(CURDIR)
 project := $(CURDIR)/src
 build	:=	 $(root)/bin

@@ -18,7 +18,7 @@ main500:
 	rm $(root)/*.o
 	$(LD) $(LDFLAGS) -o $(build)/code500.bin $(build)/loader.o $(libs)/500/*.o `find $(build) -name "*.o" ! -name "loader.o"`
 main410:
-	powerpc-eabi-gcc -nostdinc -fno-builtin -DVER=410 -c $(project)/*.c
+	$(CC) $(CFLAGS) -DVER=410 $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
@@ -28,6 +28,6 @@ main400:
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
-	$(CC) $(CFLAGS) -o $(build)/code400.bin $(build)/loader.o $(libs)/400/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	$(LD) $(LDFLAGS) -o $(build)/code400.bin $(build)/loader.o $(libs)/400/*.o `find $(build) -name "*.o" ! -name "loader.o"`
 clean:
 	rm -r $(build)/*

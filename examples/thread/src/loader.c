@@ -19,11 +19,11 @@ void _start()
   OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
 
   /* OS memory allocation functions */
-  void* (*OSAllocFromSystem)(u32 size, int align);
+  void* (*OSAllocFromSystem)(uint32_t size, int align);
 
   /* OS thread functions */
-  BOOL (*OSCreateThread)(void *thread, void *entry, int argc, void *args, u32 stack, u32 stack_size, s32 priority, u16 attr);
-  s32 (*OSResumeThread)(void *thread);
+  bool (*OSCreateThread)(void *thread, void *entry, int argc, void *args, uint32_t stack, uint32_t stack_size, int32_t priority, uint16_t attr);
+  int32_t (*OSResumeThread)(void *thread);
 
   /* Exit function */
   void (*_Exit)();
@@ -44,13 +44,13 @@ void _start()
   str[5] = 0;
 
   /* Allocate a stack for the thread */
-  u32 stack = (u32) OSAllocFromSystem(0x1000, 0x10);
+  uint32_t stack = (uint32_t) OSAllocFromSystem(0x1000, 0x10);
   stack += 0x1000;
 
   /* Create the thread */
   void *thread = OSAllocFromSystem(OSTHREAD_SIZE, 8);
-  BOOL ret = OSCreateThread(thread, OSFatal, (int)str, NULL, stack, 0x1000, 0, 1);
-  if (ret == FALSE)
+  bool ret = OSCreateThread(thread, OSFatal, (int)str, null, stack, 0x1000, 0, 1);
+  if (ret == false)
   {
 	  OSFatal("Failed to create thread");
   }

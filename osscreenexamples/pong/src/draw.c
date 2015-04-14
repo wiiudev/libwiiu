@@ -5,7 +5,7 @@ void flipBuffers()
 	unsigned int coreinit_handle;
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
 
-	void(*DCFlushRange)(void *buffer, u32 length);
+	void(*DCFlushRange)(void *buffer, uint32_t length);
 	unsigned int(*OSScreenFlipBuffersEx)(unsigned int bufferNum);
 	OSDynLoad_FindExport(coreinit_handle, 0, "DCFlushRange", &DCFlushRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenFlipBuffersEx", &OSScreenFlipBuffersEx);
@@ -38,7 +38,7 @@ void fillScreen(char r,char g,char b,char a)
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
 	unsigned int(*OSScreenClearBufferEx)(unsigned int bufferNum, unsigned int temp);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenClearBufferEx", &OSScreenClearBufferEx);
-	u32 num = (r << 24) | (g << 16) | (b << 8) | a;
+	uint32_t num = (r << 24) | (g << 16) | (b << 8) | a;
 	OSScreenClearBufferEx(0, num);
 	OSScreenClearBufferEx(1, num);
 }
@@ -48,9 +48,9 @@ void drawPixel(int x, int y, char r, char g, char b, char a)
 {
 	unsigned int coreinit_handle;
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
-	unsigned int (*OSScreenPutPixelEx)(unsigned int bufferNum, unsigned int posX, unsigned int posY, u32 color);
+	unsigned int (*OSScreenPutPixelEx)(unsigned int bufferNum, unsigned int posX, unsigned int posY, uint32_t color);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenPutPixelEx", &OSScreenPutPixelEx);
-	u32 num = (r << 24) | (g << 16) | (b << 8) | a;
+	uint32_t num = (r << 24) | (g << 16) | (b << 8) | a;
 	OSScreenPutPixelEx(0,x*2,y*2,num);
 	OSScreenPutPixelEx(1,x*2,y*2,num);
 	OSScreenPutPixelEx(0,x*2+1,y*2,num);
@@ -72,7 +72,7 @@ void drawPixel(int x, int y, char r, char g, char b, char a)
 	int height = 1024;
 	int width = 1280;
 	char *screen = (void *)0xF4000000;
-	u32 v=(x + y*width)*4;
+	uint32_t v=(x + y*width)*4;
 	screen[v]=r;
 	screen[v+1]=g;
 	screen[v+2]=b;

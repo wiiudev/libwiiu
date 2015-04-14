@@ -5,9 +5,9 @@ void _start()
 	unsigned int coreinit_handle;
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
 	//OS memory functions
-	void* (*memcpy)(void *dest, void *src, u32 length);
-	void* (*memset)(void * dest, u32 value, u32 bytes);
-	void* (*OSAllocFromSystem)(u32 size, int align);
+	void* (*memcpy)(void *dest, void *src, uint32_t length);
+	void* (*memset)(void * dest, uint32_t value, uint32_t bytes);
+	void* (*OSAllocFromSystem)(uint32_t size, int align);
 	void (*OSFreeToSystem)(void *ptr);
 	OSDynLoad_FindExport(coreinit_handle, 0, "memcpy", &memcpy);
 	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
@@ -21,21 +21,21 @@ void _start()
 	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
 	
 	//DC memory functions
-	void (*DCFlushRangeNoSync)(void *buffer, u32 length);
-	void (*DCInvalidateRange)(void *buffer, u32 length);
+	void (*DCFlushRangeNoSync)(void *buffer, uint32_t length);
+	void (*DCInvalidateRange)(void *buffer, uint32_t length);
   	OSDynLoad_FindExport(coreinit_handle, 0, "DCFlushRangeNoSync", &DCFlushRangeNoSync);
 	OSDynLoad_FindExport(coreinit_handle, 0, "DCInvalidateRange", &DCInvalidateRange);
 	
 	//LC memory functions
-	void* (*LCAlloc)( u32 bytes );
+	void* (*LCAlloc)( uint32_t bytes );
 	void (*LCDealloc)();
-	u32 (*LCHardwareIsAvailable)();
-	u32 (*LCIsDMAEnabled)();
+	uint32_t (*LCHardwareIsAvailable)();
+	uint32_t (*LCIsDMAEnabled)();
 	void (*LCEnableDMA)();
 	void (*LCDisableDMA)();
-	void (*LCLoadDMABlocks)(void* lc_addr, void* src_addr, u32 blocks);
-	void (*LCStoreDMABlocks)(void* dest_addr, void* lc_addr, u32 blocks);
-	void (*LCWaitDMAQueue)( u32 length );
+	void (*LCLoadDMABlocks)(void* lc_addr, void* src_addr, uint32_t blocks);
+	void (*LCStoreDMABlocks)(void* dest_addr, void* lc_addr, uint32_t blocks);
+	void (*LCWaitDMAQueue)( uint32_t length );
 	OSDynLoad_FindExport(coreinit_handle, 0, "LCAlloc", &LCAlloc);
 	OSDynLoad_FindExport(coreinit_handle, 0, "LCDealloc", &LCDealloc);
 	OSDynLoad_FindExport(coreinit_handle, 0, "LCHardwareIsAvailable", &LCHardwareIsAvailable);
@@ -54,18 +54,18 @@ void _start()
 	void* dest_addr=OSAllocFromSystem(512,64);
 	
 	//Store some debug values
-	__os_snprintf(output, 1000, "src_addr:%02x,",(u32)src_addr);
-	__os_snprintf(output+strlen(output), 255, "dest_addr: %02x,", (u32)dest_addr);
+	__os_snprintf(output, 1000, "src_addr:%02x,",(uint32_t)src_addr);
+	__os_snprintf(output+strlen(output), 255, "dest_addr: %02x,", (uint32_t)dest_addr);
 	
 	//Number of 32bit blocks to copy. Must be multiple of 2 between [0,127]
-	u32 blocks=2; //2 32bit blocks
+	uint32_t blocks=2; //2 32bit blocks
 	
 	//Do something to the source
 	memset(src_addr,1,64);
 	
 	//Grab values for debug
-	u32 * src_val=src_addr;
-	u32 * dest_val=dest_addr;
+	uint32_t * src_val=src_addr;
+	uint32_t * dest_val=dest_addr;
 	__os_snprintf(output+strlen(output), 255, "Old src_val: %02x\n",src_val[0]);
 	__os_snprintf(output+strlen(output), 255, "Old dest_val: %02x,",dest_val[0]);
 	
@@ -73,7 +73,7 @@ void _start()
 	void *lc_addr=LCAlloc(512); //512 Minmum. Must be multiple of 512.
 	
 	//Calculate size from blocks to flush/invalidate range properly
-	u32 size;
+	uint32_t size;
 	//If blocks is set to 0, the transaction will default to 128 blocks
 	if(blocks==0)
 	{
@@ -97,7 +97,7 @@ void _start()
 	}
 
 	//Gets the current state of DMA, so we can restore it after our copy
-	u32 dmaState=LCIsDMAEnabled();
+	uint32_t dmaState=LCIsDMAEnabled();
 
 	//Checks to see if DMA is enabled, if not it will try to enable it.
 	if(dmaState!=1)
@@ -158,7 +158,7 @@ Use substitution
 ----------------------------------------------------------------------------
 C code
 ----------------------------------------------------------------------------
-LCStoreDMABlocks(void *dest_addr,void *lc_addr,u32 blockNum)
+LCStoreDMABlocks(void *dest_addr,void *lc_addr,uint32_t blockNum)
 {
 firstParam=dest_addr|((blockNum<<30) & 0x1F);
 secondParam=(lc_addr|((r5 << 2) & 0xC))|2; //So, it looks like 0000 0000 0000 0000 0000 0000 000x 0000 bit is set if we're coping to lc_addr. If it's not set, then we're copying from lc_addr to memory. The last two bits of block num are placed here 0000 0000 0000 0000 0000 0000 0000 xx00. The second to last bit is always set 0000 0000 0000 0000 0000 0000 0000 00x0.
@@ -201,7 +201,7 @@ r4=((r3|0x10)|((r5 << 2) & 0xC))|2
 ----------------------------------------------------------------------------
 C code
 ----------------------------------------------------------------------------
-LCLoadDMABlocks(void *lc_addr,void *src_addr, u32blockNum)
+LCLoadDMABlocks(void *lc_addr,void *src_addr, uint32_tblockNum)
 {
 firstParam=src_addr|((blockNum<<30) & 0x1F);
 secondParam=((lc_addr|0x10)|(((blockNum << 2)) & 0xC))|2;//So, it looks like 0000 0000 0000 0000 0000 0000 000x 0000 bit is set if we're coping to lc_addr. If it's not set, then we're copying from lc_addr to memory. The last two bits of block num are placed here 0000 0000 0000 0000 0000 0000 0000 xx00. The second to last bit is always set 0000 0000 0000 0000 0000 0000 0000 00x0.
