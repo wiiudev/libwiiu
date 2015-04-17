@@ -35,7 +35,7 @@ void _entryPoint()
 		color_lightblue;
 		color_lightgreen;
 		color_lightred;
-	}; this is all choices */
+	}; all available choices */
 	while (1)
 	{
 		VPADRead(0, &vpad_data, 1, &error);
@@ -50,7 +50,7 @@ void _entryPoint()
 			flipBuffers();
 		}
 		
-		if (vpad_data.btn_trigger & BUTTON_LEFT)
+		if (vpad_data.btn_trigger & BUTTON_LEFT) //seems to pick random one, no idea why
 		{
 			if (color == 0) //white
 			{
@@ -86,7 +86,7 @@ void _entryPoint()
 			}
 		}
 		
-		if (vpad_data.btn_trigger & BUTTON_RIGHT)
+		if (vpad_data.btn_trigger & BUTTON_RIGHT) //seems to pick random one, no idea why
 		{
 			if (color == 4) //light red
 			{
