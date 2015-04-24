@@ -1,5 +1,6 @@
 #include "types.h"
 #include "coreinit.h"
+#include "elf.h"
 
 /* ELF loader source buffer */
 #define ELFLOADER_SRC_ADDR	0x1dd7b814
