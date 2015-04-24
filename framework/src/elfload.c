@@ -28,5 +28,9 @@ void _start()
 	if (elf_addr == (uint32_t*)0x1e000000) OSFatal("Failed to find ELF");
 	else elf_addr++;
 
+	/* Validate the ELF header */
+	elf_header_t *header = (elf_header_t*) elf_addr;
+	if (!validate_header(header)) OSFatal("Invalid ELF header");
+
 	OSFatal("Did not crash");
 }
