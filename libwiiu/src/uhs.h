@@ -51,6 +51,6 @@ int UhsOpenController(int controller_num);
 int UhsQueryInterfaces(int uhs_handle, UhsInterfaceFilter *filter, UhsInterfaceProfile *profiles, int max_profiles);
 
 /* Submit a bulk request to an endpoint */
-int UhsSubmitBulkRequest(int uhs_handle, uint32_t if_handle, int endpoint, int direction, void *buffer, int length, int timeout);
+int UhsSubmitBulkRequest(int uhs_handle, uint32_t if_handle, uint8_t endpoint, int direction, void *buffer, int length, int timeout);
 
 #endif
