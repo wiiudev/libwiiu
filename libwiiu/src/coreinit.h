@@ -15,4 +15,12 @@
 #error "Unsupported Wii U software version"
 #endif
 
+/* ioctlv() I/O vector */
+struct iovec
+{
+	void *buffer;
+	int len;
+	char unknown8[0xc-0x8];
+};
+
 #endif /* COREINIT_H */
