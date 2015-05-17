@@ -38,7 +38,7 @@ int UhsSubmitBulkRequest(int uhs_handle, uint32_t if_handle, uint8_t endpoint, i
 	void* (*memset)(void *buffer, int value, unsigned length);
 	int (*IOS_Ioctlv)(int fd, int request, int cnt_in, int cnt_out, struct iovec *vecbuf);
 	OSDynLoad_FindExport(coreinit_handle, false, "memset", &memset);
-	OSDynLoad_FindExport(coreinit_handle, false, "IOS_Ioctvl", &IOS_Ioctlv);
+	OSDynLoad_FindExport(coreinit_handle, false, "IOS_Ioctlv", &IOS_Ioctlv);
 
 	/* Allocate and fill in the request buffer */
 	char reqbuf[0xa1];
