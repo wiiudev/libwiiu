@@ -41,7 +41,8 @@ typedef struct
     UhsDeviceDescriptor dev_desc;
     UhsConfigDescriptor cfg_desc;
     UhsInterfaceDescriptor if_desc;
-    char unknown4c[0x16c - 0x4c];
+    char in_endpoints[0xdc - 0x4c];
+	char out_endpoints[0x16c - 0xdc];
 } UhsInterfaceProfile;
 
 /* Open a specific controller under /dev/uhs */
