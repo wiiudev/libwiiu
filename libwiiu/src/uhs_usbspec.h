@@ -24,7 +24,7 @@ typedef struct
     uint8_t iProduct;
     uint8_t iSerialNumber;
     uint8_t bNumConfigurations;
-} UhsDeviceDescriptor;
+} __attribute__((packed)) UhsDeviceDescriptor;
  
 /* USB configuration descriptor */
 typedef struct
@@ -37,7 +37,7 @@ typedef struct
     uint8_t iConfiguration;
     uint8_t bmAttributes;
     uint8_t bMaxPower;
-} UhsConfigDescriptor;
+} __attribute__((packed)) UhsConfigDescriptor;
  
 /* USB interface descriptor */
 typedef struct
@@ -51,6 +51,6 @@ typedef struct
     uint8_t bInterfaceSubClass;
     uint8_t bInterfaceProtocol;
     uint8_t iInterface;
-} UhsInterfaceDescriptor;
+} __attribute__((packed)) UhsInterfaceDescriptor;
 
 #endif

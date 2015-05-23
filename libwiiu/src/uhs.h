@@ -31,7 +31,7 @@ typedef struct
 	uint8_t if_class;			/* Interface class */
 	uint8_t if_subclass;		/* Interface subclass */
 	uint8_t if_protocol;		/* Interface protocol */
-} UhsInterfaceFilter;
+} __attribute__((packed)) UhsInterfaceFilter;
 
 /* Interface profile */
 typedef struct
@@ -43,7 +43,7 @@ typedef struct
     UhsInterfaceDescriptor if_desc;
     char in_endpoints[0xdc - 0x4c];
 	char out_endpoints[0x16c - 0xdc];
-} UhsInterfaceProfile;
+} __attribute__((packed)) UhsInterfaceProfile;
 
 /* Open a specific controller under /dev/uhs */
 int UhsOpenController(int controller_num);
