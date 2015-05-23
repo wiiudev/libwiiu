@@ -1,5 +1,5 @@
 CC=powerpc-eabi-gcc
-CFLAGS=-nostdinc -fno-builtin -c
+CFLAGS=-std=c99 -nostdinc -fno-builtin -c
 LD=powerpc-eabi-ld
 LDFLAGS=-Ttext 1800000 --oformat binary
 project	:=	src
