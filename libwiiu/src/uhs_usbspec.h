@@ -1,6 +1,12 @@
 #ifndef UHS_USBSPEC
 #define UHS_USBSPEC
 
+/* USB class codes */
+#define USBCLASS_DEVICE		0x00
+#define USBCLASS_AUDIO		0x01
+#define USBCLASS_HID		0x03
+#define USBCLASS_STORAGE	0x08
+
 /* USB device descriptor */
 typedef struct
 {

@@ -18,9 +18,17 @@ void _start()
 	int num_ifs = UhsQueryInterfaces(uhs_handle, &filter, &profiles[0], 4);
 	if (num_ifs <= 0) OSFatal("No USB interfaces detected");
 
-	char buffer[256];
-	__os_snprintf(buffer, 256, "Detected %d USB interfaces", num_ifs);
-	OSFatal(buffer);
+	/* Find a mass storage interface */
+	UhsInterfaceProfile *iface_stor = NULL;
+	for (int i = 0; i < 4; i++)
+	{
+		if (profiles[i].if_desc.bInterfaceClass == USBCLASS_STORAGE)
+		{
+			iface_stor = &profiles[i];
+			break;
+		}
+	}
+	if (!iface_stor) OSFatal("No storage interfaces detected");
 
 	/* Infinite loop */
 	while(1);
