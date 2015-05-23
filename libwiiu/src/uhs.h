@@ -1,8 +1,8 @@
 #ifndef UHS_H
 #define UHS_H
 
-/* USB specification structures */
-#include <uhs_usbspec.h>
+#include "types.h"
+#include "uhs_usbspec.h"
 
 /* Determines which interface parameters to check */
 #define MATCH_ANY				0x000
