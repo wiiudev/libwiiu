@@ -33,12 +33,15 @@ void _start()
 	}
 	if (!iface_stor) OSFatal("No storage interfaces detected");
 
+	/* Force the release of the interface and reacquire it */
+	int ret = UhsReleaseInterface(uhs_handle, iface_stor->if_handle, false);
+	//ret = UhsAcquireInterface(uhs_handle, iface_stor->if_handle, NULL, &callback);
+
 	/* Acquire and reset the storage interface */
-	int ret = UhsAcquireInterface(uhs_handle, iface_stor->if_handle, NULL, &callback);
 	//ret = UhsSubmitControlRequest(uhs_handle, iface_stor->if_handle, NULL, 0xFF, 0x21, 0, (uint16_t)iface_stor->if_desc.bInterfaceNumber, 0, TIMEOUT_NONE);
 
 	char buffer[256];
-	__os_snprintf(buffer, 256, "Acquire returned %d", ret);
+	__os_snprintf(buffer, 256, "Release returned %d", ret);
 	OSFatal(buffer);
 
 	/* Infinite loop */

@@ -48,6 +48,25 @@ int UhsAcquireInterface(int uhs_handle, uint32_t if_handle, void *unk1, int (*ca
 	return IOS_Ioctl(uhs_handle, 0x4, &reqbuf[0], 0xc, 0, 0);
 }
 
+/* Release a currently-held USB device interface */
+int UhsReleaseInterface(int uhs_handle, uint32_t if_handle, bool no_reacquire)
+{
+	/* Symbol loading */
+	unsigned int coreinit_handle;
+	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
+	int (*IOS_Ioctl)(int fd, int request, void *inbuf, int inlen, void *outbuf, int outlen);
+	OSDynLoad_FindExport(coreinit_handle, false, "IOS_Ioctl", &IOS_Ioctl);
+
+	/* Allocate and fill in the request buffer */
+	uint32_t reqbuf[3];
+	reqbuf[0] = if_handle;
+	reqbuf[1] = (uint32_t)no_reacquire;
+	reqbuf[2] = 0;
+
+	/* Perform the ioctl() request */
+	return IOS_Ioctl(uhs_handle, 0x5, &reqbuf[0], 0xc, 0, 0);
+}
+
 /* Submit a control request to endpoint 0 */
 int UhsSubmitControlRequest(int uhs_handle, uint32_t if_handle, void *buffer, uint8_t bRequest, uint8_t bmRequestType, uint16_t wValue, uint16_t wIndex, uint16_t wLength, int timeout)
 {
