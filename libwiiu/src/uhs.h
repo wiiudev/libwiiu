@@ -58,7 +58,7 @@ int UhsQueryInterfaces(int uhs_handle, UhsInterfaceFilter *filter, UhsInterfaceP
 int UhsAcquireInterface(int uhs_handle, uint32_t if_handle, void *unk1, int (*callback)(int arg0, int arg1, int arg2));
 
 /* Release a currently-held USB device interface */
-int UhsReleaseInterface(int uhs_handle, uint32_t if_handle, bool no_reacquire)
+int UhsReleaseInterface(int uhs_handle, uint32_t if_handle, bool no_reacquire);
 
 /* Submit a control request to endpoint 0 */
 int UhsSubmitControlRequest(int uhs_handle, uint32_t if_handle, void *buffer, uint8_t bRequest, uint8_t bmRequestType, uint16_t wValue, uint16_t wIndex, uint16_t wLength, int timeout);
