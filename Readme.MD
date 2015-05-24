@@ -17,37 +17,37 @@ This repository contains a C build system, which allows you to compile your own 
 * Python 3.x
 
 #### Build Example ####
-The osscreenexamples folder contains projects using OSScreen and the loader.c from libwiiu. The examples folder does not use OSScreen and uses the loader.c in the projects local directory.
-* python build.py <project path>
-* python build.py osscreenexamples/template
+The `osscreenexamples` folder contains projects using `OSScreen` and the `loader.c` from `libwiiu`. The `examples` folder does not use `OSScreen` and uses the `loader.c` in the `projects` local directory.
+* `python build.py <project path>`
+* `python build.py osscreenexamples/template`
 
 #### Accessing the SDK libraries ####
 
 When you're writing C code on a PC, you have the standard library, a set of useful functions that you can call without caring how they work. For writing code on the Wii U, there's something similar: the SDK libraries. The SDK libraries provide access to graphics, audio, input, filesystem, and network functions. The SDK libraries are accessible from any application, including the web browser, which means that code running inside it using an exploit also gets access. All SDK libraries have full symbols available for every function. Aside from making reverse engineering easier, this means that you can get the address of any function by its library and symbol name.
 
-Every SDK library is an RPL file, a modification of the ELF format. For example, gx2.rpl is the name of the graphics library, vpad.rpl is the name of the Gamepad input library, and nsysnet.rpl is the name of the BSD sockets library. There is also a special RPL called coreinit.rpl, which is quite interesting. coreinit provides direct access to many core Cafe OS services, including memory management and threading. coreinit was also quite useful for providing the functions we needed in our ROP chain. :)
+Every SDK library is an RPL file, a modification of the ELF format. For example, `gx2.rpl` is the name of the graphics library, `vpad.rpl` is the name of the Gamepad input library, and `nsysnet.rpl` is the name of the BSD sockets library. There is also a special RPL called `coreinit.rpl`, which is quite interesting. `coreinit` provides direct access to many core Cafe OS services, including memory management and threading. coreinit was also quite useful for providing the functions we needed in our ROP chain. :)
 
-The SDK libraries expose many functions, but how do you get their addresses? You could just hardcode them, obviously, but that's both lame and not portable to later exploit versions. Plus how do you find the address to hardcode in the first place? There's a much better method available, which allows you to get symbol addresses dynamically, in the form of the coreinit OSDynLoad functions. You can access these functions by including coreinit.h in your C file.
+The SDK libraries expose many functions, but how do you get their addresses? You could just hardcode them, obviously, but that's both lame and not portable to later exploit versions. Plus how do you find the address to hardcode in the first place? There's a much better method available, which allows you to get symbol addresses dynamically, in the form of the `coreinit` `OSDynLoad` functions. You can access these functions by including `coreinit.h` in your C file.
 
-There are two functions involved in getting a symbol, splitting the process into two parts. The first function is OSDynLoad_Acquire(), which loads the RPL you specify. OSDynLoad_Acquire() takes two arguments: the RPL name as a string and a pointer to an integer. The RPL name is pretty straightforward, the pointer to an integer is where coreinit will store the library's location. OSDynLoad_Acquire() can also be used to get the location of a library that's already loaded. The second function is OSDynLoad_FindExport(), which finds a symbol given a library's location. It takes four arguments: the integer (**not** the pointer to it) used in OSDynLoad_Acquire(), whether the symbol is data or not (usually not), the symbol name as a string, and a pointer to where the symbol address should be stored. Here are the function prototypes:
+There are two functions involved in getting a symbol, splitting the process into two parts. The first function is `OSDynLoad_Acquire()`, which loads the RPL you specify. `OSDynLoad_Acquire()` takes two arguments: the RPL name as a string and a pointer to an integer. The RPL name is pretty straightforward, the pointer to an integer is where coreinit will store the library's location. `OSDynLoad_Acquire()` can also be used to get the location of a library that's already loaded. The second function is `OSDynLoad_FindExport()`, which finds a symbol given a library's location. It takes four arguments: the integer (**not** the pointer to it) used in `OSDynLoad_Acquire()`, whether the symbol is data or not (usually not), the symbol name as a string, and a pointer to where the symbol address should be stored. Here are the function prototypes:
 
-* void OSDynLoad_Acquire(char \*rplname, unsigned int \*handle);
-* void OSDynLoad_FindExport(unsigned int handle, int isdata, char \*symname, void \*address);
+* `void OSDynLoad_Acquire(char \*rplname, unsigned int \*handle);`
+* `void OSDynLoad_FindExport(unsigned int handle, int isdata, char \*symname, void \*address);`
 
-Just as an example, let's say I wanted the VPADRead() symbol from vpad.rpl. If I have an integer called "handle", I first call OSDynLoad_Acquire("vpad.rpl", &handle); to get the RPL's location. Next, if I have a function pointer for VPADRead() called "VPADRead", I call OSDynLoad_FindExport(handle, 0, "VPADRead", &VPADRead); to retrive VPADRead()'s address. Simple. For more examples, look at rpc.c.
+Just as an example, let's say I wanted the `VPADRead()` symbol from `vpad.rpl`. If I have an integer called `handle`, I first call `OSDynLoad_Acquire("vpad.rpl", &handle);` to get the RPL's location. Next, if I have a function pointer for `VPADRead()` called `VPADRead`, I call `OSDynLoad_FindExport(handle, 0, "VPADRead", &VPADRead);` to retrive `VPADRead()`'s address. Simple. For more examples, look at `rpc.c`.
 
 #### RPC system ####
 
 In addition to letting you write your own C code to run on the Wii U, this repository also includes an RPC system to interactively experiment with the Wii U. It allows you to send commands over the network for your Wii U to execute. The two components of the RPC system are the server, a C program running on the Wii U listening for commands, and the client, a Python script that sends the commands.
 
-To use the RPC system, first ensure that your PC and Wii U are connected to the same network. Once they are, find out your PC's IP address using the "ipconfig" command (Windows) or "ifconfig" command (Linux and OS X). Modify PC_IP in socket.h to be your PC's IP address (rather than 192.168.1.4, which it currently is). Build rpc.c and it will go in your htdocs.
+To use the RPC system, first ensure that your PC and Wii U are connected to the same network. Once they are, find out your PC's IP address using the `ipconfig` command (Windows) or `ifconfig` command (Linux and OS X). Modify `PC_IP` in `socket.h` to be your PC's IP address (rather than `192.168.1.4`, which it currently is). Build `rpc.c` and it will go in your `htdocs`.
 
-Next, start rpc.py in an interactive Python session (IDLE or IPython is a good choice). Once you've started rpc.py, navigate to the browser exploit you just made on your Wii U. It should appear to finish loading the page, and the UI will continue to be responsive, but web browsing will be disabled. At that point, the Python shell should say something along the lines of "Connected by" followed by your Wii U's IP. Now you can control your Wii U with these commands:
+Next, start `rpc.py` in an interactive Python session (IDLE or IPython is a good choice). Once you've started `rpc.py`, navigate to the browser exploit you just made on your Wii U. It should appear to finish loading the page, and the UI will continue to be responsive, but web browsing will be disabled. At that point, the Python shell should say something along the lines of "Connected by" followed by your Wii U's IP. Now you can control your Wii U with these commands:
 
-* rpc.read32(address, num_words) - Read *num_words* words starting at *address*, returning a list of words
-* rpc.write32(address, words) - Write each word in the list *words* to memory starting at *address*
-* symbol(rplname, symname) - Get the symbol *symname* from RPL *rplname* and turn it into a callable Python function
-* rpc.exit() - Exit the browser and go back to the menu
+* `rpc.read32(address, num_words)` - Read *`num_words`* words starting at *`address`*, returning a list of words
+* `rpc.write32(address, words)` - Write each word in the list *`words`* to memory starting at *`address`*
+* `symbol(rplname, symname)` - Get the symbol *`symname`* from RPL *`rplname`* and turn it into a callable Python function
+* `rpc.exit()` - Exit the browser and go back to the menu
 
 ### Credits ###
 
@@ -55,6 +55,6 @@ Next, start rpc.py in an interactive Python session (IDLE or IPython is a good c
 * TheKit - WebKit bug finding, ROP chain implementation
 * Hykem - Finding ROP gadgets
 * bubba - Testing WebKit bug candidates
-* comex - Access to the coreinit and WebKit binaries
+* comex - Access to the `coreinit` and WebKit binaries
 * Chadderz - Blind memory dumping on 5.0.0
-* Relys - Testing exploits. Complete refactor of exploit framework, build process and scripts. OSResetGame trick to use OSScreen functions.
+* Relys - Testing exploits. Complete refactor of exploit framework, build process and scripts. `OSResetGame` trick to use `OSScreen` functions.
