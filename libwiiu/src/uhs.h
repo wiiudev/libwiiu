@@ -51,6 +51,9 @@ int UhsOpenController(int controller_num);
 /* Determine which USB device interfaces are plugged in and available */
 int UhsQueryInterfaces(int uhs_handle, UhsInterfaceFilter *filter, UhsInterfaceProfile *profiles, int max_profiles);
 
+/* Submit a control request to endpoint 0 */
+int UhsSubmitControlRequest(int uhs_handle, uint32_t if_handle, void *buffer, uint8_t bRequest, uint8_t bmRequestType, uint16_t wValue, uint16_t wIndex, uint16_t wLength, int timeout);
+
 /* Submit a bulk request to an endpoint */
 int UhsSubmitBulkRequest(int uhs_handle, uint32_t if_handle, uint8_t endpoint, int direction, void *buffer, int length, int timeout);
 

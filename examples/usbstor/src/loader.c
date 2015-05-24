@@ -30,6 +30,8 @@ void _start()
 	}
 	if (!iface_stor) OSFatal("No storage interfaces detected");
 
+	/* Reset the storage interface */
+
 	/* Infinite loop */
 	while(1);
 }
