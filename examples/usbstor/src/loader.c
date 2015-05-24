@@ -31,6 +31,11 @@ void _start()
 	if (!iface_stor) OSFatal("No storage interfaces detected");
 
 	/* Reset the storage interface */
+	int ret = UhsSubmitControlRequest(uhs_handle, iface_stor->if_handle, NULL, 0xFF, 0x21, 0, (uint16_t)iface_stor->if_desc.bInterfaceNumber, 0, TIMEOUT_NONE);
+
+	char buffer[256];
+	__os_snprintf(buffer, 256, "Control request returned %d", ret);
+	OSFatal(buffer);
 
 	/* Infinite loop */
 	while(1);

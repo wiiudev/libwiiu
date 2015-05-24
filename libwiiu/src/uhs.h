@@ -18,6 +18,9 @@
 /* Endpoint transfer directions */
 #define ENDPOINT_TRANSFER_OUT	1
 #define ENDPOINT_TRANSFER_IN	2
+
+/* Special timeout values */
+#define TIMEOUT_NONE			-1
  
 /* Interface filter */
 typedef struct
