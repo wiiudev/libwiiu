@@ -1,5 +1,8 @@
 #include "loader.h"
 
+/* Acquisition callback */
+int callback(int arg0, int arg1, int arg2);
+
 /* Start of our code */
 void _start()
 {
@@ -30,13 +33,20 @@ void _start()
 	}
 	if (!iface_stor) OSFatal("No storage interfaces detected");
 
-	/* Reset the storage interface */
-	int ret = UhsSubmitControlRequest(uhs_handle, iface_stor->if_handle, NULL, 0xFF, 0x21, 0, (uint16_t)iface_stor->if_desc.bInterfaceNumber, 0, TIMEOUT_NONE);
+	/* Acquire and reset the storage interface */
+	int ret = UhsAcquireInterface(uhs_handle, iface_stor->if_handle, NULL, &callback);
+	//ret = UhsSubmitControlRequest(uhs_handle, iface_stor->if_handle, NULL, 0xFF, 0x21, 0, (uint16_t)iface_stor->if_desc.bInterfaceNumber, 0, TIMEOUT_NONE);
 
 	char buffer[256];
-	__os_snprintf(buffer, 256, "Control request returned %d", ret);
+	__os_snprintf(buffer, 256, "Acquire returned %d", ret);
 	OSFatal(buffer);
 
 	/* Infinite loop */
 	while(1);
+}
+
+/* Acquisition callback */
+int callback(int arg0, int arg1, int arg2)
+{
+	OSFatal("In the callback");
 }
