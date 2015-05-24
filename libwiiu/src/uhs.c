@@ -63,7 +63,7 @@ int UhsSubmitControlRequest(int uhs_handle, uint32_t if_handle, void *buffer, ui
 
 	/* Perform the ioctlv() request */
 	if (bmRequestType & (1 << 7)) return IOS_Ioctlv(uhs_handle, 0xe, 1, 1, &vecbuf[0]);
-	else return return IOS_Ioctlv(uhs_handle, 0xe, 0, 2, &vecbuf[0]);
+	else return IOS_Ioctlv(uhs_handle, 0xe, 0, 2, &vecbuf[0]);
 }
 
 /* Submit a bulk request to an endpoint */
