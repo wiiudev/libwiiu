@@ -6,7 +6,7 @@
 #define OP_WRITE16	0x8A
 
 /* READ(16) command */
-typedef struct write16_cmd
+typedef struct read16_cmd
 {
 	uint8_t op_code;
 	uint8_t flags;
