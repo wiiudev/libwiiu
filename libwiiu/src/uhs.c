@@ -29,6 +29,25 @@ int UhsQueryInterfaces(int uhs_handle, UhsInterfaceFilter *filter, UhsInterfaceP
 	return IOS_Ioctl(uhs_handle, 0x11, filter, 0x10, profiles, max_profiles * 0x16c);
 }
 
+/* Acquire a USB device interface for use */
+int UhsAcquireInterface(int uhs_handle, uint32_t if_handle, void *unk1, void (*callback)(int arg0, int arg1, int arg2))
+{
+	/* Symbol loading */
+	unsigned int coreinit_handle;
+	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
+	int (*IOS_Ioctl)(int fd, int request, void *inbuf, int inlen, void *outbuf, int outlen);
+	OSDynLoad_FindExport(coreinit_handle, false, "IOS_Ioctl", &IOS_Ioctl);
+
+	/* Allocate and fill in the request buffer */
+	uint32_t reqbuf[3];
+	reqbuf[0] = if_handle;
+	reqbuf[1] = (uint32_t)unk1;
+	reqbuf[2] = (uint32_t)callback;
+
+	/* Perform the ioctl() request */
+	return IOS_Ioctl(uhs_handle, 0x4, &reqbuf[0], 0xc, 0, 0);
+}
+
 /* Submit a control request to endpoint 0 */
 int UhsSubmitControlRequest(int uhs_handle, uint32_t if_handle, void *buffer, uint8_t bRequest, uint8_t bmRequestType, uint16_t wValue, uint16_t wIndex, uint16_t wLength, int timeout)
 {
@@ -62,8 +81,8 @@ int UhsSubmitControlRequest(int uhs_handle, uint32_t if_handle, void *buffer, ui
 	vecbuf[1].len = (int)wLength;
 
 	/* Perform the ioctlv() request */
-	if (bmRequestType & (1 << 7)) return IOS_Ioctlv(uhs_handle, 0xe, 1, 1, &vecbuf[0]);
-	else return IOS_Ioctlv(uhs_handle, 0xe, 0, 2, &vecbuf[0]);
+	if (bmRequestType & (1 << 7)) return IOS_Ioctlv(uhs_handle, 0xc, 1, 1, &vecbuf[0]);
+	else return IOS_Ioctlv(uhs_handle, 0xc, 0, 2, &vecbuf[0]);
 }
 
 /* Submit a bulk request to an endpoint */
