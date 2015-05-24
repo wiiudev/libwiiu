@@ -30,7 +30,7 @@ int UhsQueryInterfaces(int uhs_handle, UhsInterfaceFilter *filter, UhsInterfaceP
 }
 
 /* Acquire a USB device interface for use */
-int UhsAcquireInterface(int uhs_handle, uint32_t if_handle, void *unk1, void (*callback)(int arg0, int arg1, int arg2))
+int UhsAcquireInterface(int uhs_handle, uint32_t if_handle, void *unk1, int (*callback)(int arg0, int arg1, int arg2))
 {
 	/* Symbol loading */
 	unsigned int coreinit_handle;
