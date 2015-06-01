@@ -3,6 +3,7 @@ CFLAGS=-nostdinc -fno-builtin -c
 LD=powerpc-eabi-ld
 LDFLAGS=-Ttext 1800000 --oformat binary
 
+override CURDIR:=$(shell cygpath -m $(CURDIR))
 root:=$(CURDIR)
 project	:=	$(root)/src
 build	:=	 $(root)/bin

@@ -1,8 +1,9 @@
 CC=powerpc-eabi-gcc
 CFLAGS=-nostdinc -fno-builtin -c
+override CURDIR:=$(shell cygpath -m $(CURDIR))
 root	:= $(CURDIR)
-project := $(CURDIR)/src
-build	:=	 $(root)/bin
+project := $(root)/src
+build	:=	$(root)/bin
 all: setup libwiiu500 libwiiu410 libwiiu400
 
 setup:
