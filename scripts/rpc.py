@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import division
 import socket, struct
 
 class WiiURpc():
@@ -101,6 +102,32 @@ class WiiURpc():
 		for word in logs:
 			dump.write(struct.pack(">I", word))
 		dump.close()
+		
+	def dump_mem(self, address, length, filename):
+		data = []
+		size = (length // 4)
+		remaining = size
+		step = 0x400
+		if (size < step):
+			data += list(self.read32(address, size))
+			remaining = 0
+		while remaining > 0:
+			if (remaining < step):
+				data += list(self.read32(address, remaining))
+				remaining = 0
+			else:
+				data += list(self.read32(address, step))
+				remaining -= step
+				
+			address += step
+			print("Dumping: " + "{0:.2f}".format(100 - (((remaining * 4) / (size * 4)) * 100)) + "%")
+		
+		print("Dumped to " + filename)
+
+		mem = open(filename, 'wb')
+		for word in data:
+			mem.write(struct.pack(">I", word))
+		mem.close()
 
 	def walkThreadList(self):
 		symbol('coreinit.rpl','OSGetCurrentThread')
@@ -180,6 +207,7 @@ class WiiURpc():
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)		
 		self.data = []
+		print("Listening...")
 		self.listen('0.0.0.0', 12345)
 		
 class ExportedSymbol(object):

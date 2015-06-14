@@ -7,7 +7,7 @@ override CURDIR:=$(shell cygpath -m $(CURDIR))
 root:=$(CURDIR)
 project	:=	$(root)/src
 build	:=	 $(root)/bin
-all: setup findcode500 findcode410 findcode400
+all: setup findcode500 findcode410 findcode400 findcode300
 setup:
 	mkdir -p $(root)/bin
 findcode500:
@@ -56,6 +56,22 @@ ifeq ("$(wildcard $(build)/findcode400.bin)","")
 	dd if=$(build)/findcode400.bin of=$(build)/findcode400.bin bs=4 obs=4 skip=6 seek=2 conv=notrunc
 	#Differen't on 400
 	dd if=$(build)/findcode400.bin of=$(build)/stack400.bin obs=352 seek=1 conv=notrunc
+endif
+findcode300:
+ifeq ("$(wildcard $(build)/findcode300.bin)","")
+	# Build findcode
+	$(CC) $(CFLAGS) -DVER=300+ $(project)/findcode300.c
+	#-Wa,-a,-ad
+	cp -r $(root)/findcode300.o $(build)
+	rm $(root)/findcode300.o
+	$(LD) $(LDFLAGS) -o $(build)/findcode300.bin $(build)/findcode300.o
+	# Get rid of GCC function prologue and move stack out of our buffer
+	# Result should start with: 94 21 E0 00 7C 3F 0B 78 3D 20 1D D7 61 29 B8 14
+	dd if=$(build)/findcode300.bin of=$(build)/findcode300.bin bs=4 obs=4 skip=5 count=1 conv=notrunc
+	dd if=$(build)/findcode300.bin of=$(build)/findcode300.bin bs=4 obs=4 skip=4 seek=1 count=1 conv=notrunc
+	dd if=$(build)/findcode300.bin of=$(build)/findcode300.bin bs=4 obs=4 skip=6 seek=2 conv=notrunc
+	#Differen't on 300
+	dd if=$(build)/findcode300.bin of=$(build)/stack300.bin obs=352 seek=1 conv=notrunc
 endif
 clean:
 	rm -r $(build)/*

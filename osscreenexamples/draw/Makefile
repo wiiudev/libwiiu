@@ -9,7 +9,7 @@ build	:=	 $(root)/bin
 libs := $(root)/../../libwiiu/bin
 www :=$(root)/../../www
 framework:=$(root)/../../framework
-all: setup main500 main410 main400
+all: setup main500 main410 main400 main300
 setup:
 	mkdir -p $(root)/bin/
 main500:
@@ -30,5 +30,11 @@ main400:
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
 	$(LD) $(LDFLAGS) -o $(build)/code400.bin $(build)/loader.o `find $(libs)/400/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
+main300:
+	$(CC) $(CFLAGS) -DVER=300 $(project)/*.c
+	#-Wa,-a,-ad
+	cp -r $(root)/*.o $(build)
+	rm $(root)/*.o
+	$(LD) $(LDFLAGS) -o $(build)/code300.bin $(build)/loader.o `find $(libs)/300/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
 clean:
 	rm -r $(build)/*
