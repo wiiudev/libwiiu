@@ -1,6 +1,6 @@
 # README #
 
-This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only. Right now, supported versions 4.0.x, 4.1.0, 5.0.0, and 5.1.0).
+This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only. Right now, the supported versions are 3.x.x, 4.0.x, 4.1.0, 5.0.0, and 5.1.0).
 
 ### What's inside? ###
 
@@ -14,7 +14,7 @@ This repository contains a C build system, which allows you to compile your own 
 
 * Unix-like shell environment (use Cygwin to get this on Windows)
 * devkitPPC (needed to compile and link the C code)
-* Python 3.x
+* Python 3.x or 2.x
 
 #### Build Example ####
 The `osscreenexamples` folder contains projects using `OSScreen` and the `loader.c` from `libwiiu`. The `examples` folder does not use `OSScreen` and uses the `loader.c` in the `projects` local directory.
@@ -46,6 +46,7 @@ Next, start `rpc.py` in an interactive Python session (IDLE or IPython is a good
 
 * `rpc.read32(address, num_words)` - Read *`num_words`* words starting at *`address`*, returning a list of words
 * `rpc.write32(address, words)` - Write each word in the list *`words`* to memory starting at *`address`*
+* `rpc.dump_mem(address, length, filename)` - Dump *`length`* bytes from memory starting at *`address`* to *`filename`*
 * `symbol(rplname, symname)` - Get the symbol *`symname`* from RPL *`rplname`* and turn it into a callable Python function
 * `rpc.exit()` - Exit the browser and go back to the menu
 
