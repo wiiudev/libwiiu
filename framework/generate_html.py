@@ -84,9 +84,9 @@ def values_to_js(values):
 	for i, chunk in enumerate(chunks(values, 0x10)):
 		encoded = ''.join(['%u{}%u{}'.format('{:08x}'.format(value)[:4], '{:08x}'.format(value)[4:]) for value in chunk])
 		if not i:
-			lines.append('                var str = unescape("{}");'.format(encoded))
+			lines.append('    var str = unescape("{}");'.format(encoded))
 		else:
-			lines.append('                str    += unescape("{}");'.format(encoded))           
+			lines.append('    str    += unescape("{}");'.format(encoded))           
 	
 	return '\n'.join(lines)
 
