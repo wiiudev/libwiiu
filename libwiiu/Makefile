@@ -4,13 +4,19 @@ override CURDIR:=$(shell cygpath -m $(CURDIR))
 root	:= $(CURDIR)
 project := $(root)/src
 build	:=	$(root)/bin
-all: setup libwiiu500 libwiiu410 libwiiu400 libwiiu300
+all: setup libwiiu532 libwiiu500 libwiiu410 libwiiu400 libwiiu300
 
 setup:
+	mkdir -p $(root)/bin/532/
 	mkdir -p $(root)/bin/500/
 	mkdir -p $(root)/bin/410/
 	mkdir -p $(root)/bin/400/
 	mkdir -p $(root)/bin/300/
+libwiiu532:
+	$(CC) $(CFLAGS) -DVER=532  $(project)/*.c
+	#-Wa,-a,-ad
+	cp -r $(root)/*.o $(build)/532
+	rm $(root)/*.o
 libwiiu500:
 	$(CC) $(CFLAGS) -DVER=500  $(project)/*.c
 	#-Wa,-a,-ad
@@ -32,4 +38,4 @@ libwiiu300:
 	cp -r $(root)/*.o $(build)/300
 	rm $(root)/*.o
 clean:
-	rm -r $(build)/500/* $(build)/410/* $(build)/400/* $(build)/300/*
+	rm -r $(build)/532/* $(build)/500/* $(build)/410/* $(build)/400/* $(build)/300/*

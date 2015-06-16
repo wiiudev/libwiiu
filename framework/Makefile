@@ -7,9 +7,25 @@ override CURDIR:=$(shell cygpath -m $(CURDIR))
 root:=$(CURDIR)
 project	:=	$(root)/src
 build	:=	 $(root)/bin
-all: setup findcode500 findcode410 findcode400 findcode300
+all: setup findcode532 findcode500 findcode410 findcode400 findcode300
 setup:
 	mkdir -p $(root)/bin
+findcode532:
+ifeq ("$(wildcard $(build)/findcode532.bin)","")
+	# Build findcode
+	$(CC) $(CFLAGS) -DVER=532+ $(project)/findcode532.c
+	#-Wa,-a,-ad
+	cp -r $(root)/findcode532.o $(build)
+	rm $(root)/findcode532.o
+	$(LD) $(LDFLAGS) -o $(build)/findcode532.bin $(build)/findcode532.o
+	# Get rid of GCC function prologue and move stack out of our buffer
+	# Result should start with: 94 21 E0 00 7C 3F 0B 78 3D 20 1D D7 61 29 B8 14
+	dd if=$(build)/findcode532.bin of=$(build)/findcode532.bin bs=4 obs=4 skip=5 count=1 conv=notrunc
+	dd if=$(build)/findcode532.bin of=$(build)/findcode532.bin bs=4 obs=4 skip=4 seek=1 count=1 conv=notrunc
+	dd if=$(build)/findcode532.bin of=$(build)/findcode532.bin bs=4 obs=4 skip=6 seek=2 conv=notrunc
+
+	dd if=$(build)/findcode532.bin of=$(build)/stack532.bin obs=432 seek=1 conv=notrunc
+endif
 findcode500:
 ifeq ("$(wildcard $(build)/findcode500.bin)","")
 	# Build findcode

