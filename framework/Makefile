@@ -24,7 +24,7 @@ ifeq ("$(wildcard $(build)/findcode532.bin)","")
 	dd if=$(build)/findcode532.bin of=$(build)/findcode532.bin bs=4 obs=4 skip=4 seek=1 count=1 conv=notrunc
 	dd if=$(build)/findcode532.bin of=$(build)/findcode532.bin bs=4 obs=4 skip=6 seek=2 conv=notrunc
 
-	dd if=$(build)/findcode532.bin of=$(build)/stack532.bin obs=432 seek=1 conv=notrunc
+	dd if=$(build)/findcode532.bin of=$(build)/stack532.bin obs=876 seek=1 conv=notrunc
 endif
 findcode500:
 ifeq ("$(wildcard $(build)/findcode500.bin)","")

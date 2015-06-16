@@ -5,11 +5,19 @@
 
 #define BUFFER_ADDR 0x1b201b20
 #define CODE_START	0xCAFECAFE
+#define OSPANIC_CB	0x1003AAAC
 
 void start()
 {
+	/* Set up a different stack */
     asm("stwu %r1,-0x2000(%r1)");
-	OSFatal("Shellcode works!");
+
+	/* Remove the OSPanic() callback */
+	unsigned int *ospanic_cb = (unsigned int*)OSPANIC_CB;
+	ospanic_cb[0] = ospanic_cb[1] = 0;
+
+	/* Test printing */
+	OSFatal("Hello");
     /*unsigned int * start = (unsigned int*)BUFFER_ADDR;
     int i;
   
