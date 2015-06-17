@@ -9,9 +9,15 @@ build	:=	 $(root)/bin
 libs := $(root)/../../libwiiu/bin
 www :=$(root)/../../www
 framework:=$(root)/../../framework
-all: setup main500 main410 main400 main300
+all: setup main532 main500 main410 main400 main300
 setup:
 	mkdir -p $(root)/bin/
+main532:
+	$(CC) $(CFLAGS) -DVER=532 $(project)/*.c
+	#-Wa,-a,-ad
+	cp -r $(root)/*.o $(build)
+	rm $(root)/*.o
+	$(LD) $(LDFLAGS) -o $(build)/code532.bin $(build)/loader.o `find $(libs)/532/ -name "*.o" ! -name "draw.o"` `find $(build) -name "*.o" ! -name "loader.o"`
 main500:
 	$(CC) $(CFLAGS) -DVER=500 $(project)/*.c
 	#-Wa,-a,-ad
