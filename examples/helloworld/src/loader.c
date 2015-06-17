@@ -2,5 +2,5 @@
 
 void _start()
 {
-    OSFatal("Hello on 5.x");
+    OSFatal("Hello on 5.3.2!");
 }
