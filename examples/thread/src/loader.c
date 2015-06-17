@@ -1,6 +1,6 @@
 #include "loader.h"
 
-#define OSTHREAD_SIZE	0x600
+#define OSTHREAD_SIZE	0x1000
 
 /* Entry point for core 0 */
 void core0_entry(int argc, void *args);
@@ -35,13 +35,13 @@ void _start()
   OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
 
   /* Create a string argument */
-  char *str = OSAllocFromSystem(6, 1);
-  str[0] = 'H';
+  char *str/* = OSAllocFromSystem(6, 1);
+  /*str[0] = 'H';
   str[1] = 'e';
   str[2] = 'l';
   str[3] = 'l';
   str[4] = 'o';
-  str[5] = 0;
+  str[5] = 0*/;
 
   /* Allocate a stack for the thread */
   uint32_t stack = (uint32_t) OSAllocFromSystem(0x1000, 0x10);
@@ -49,7 +49,7 @@ void _start()
 
   /* Create the thread */
   void *thread = OSAllocFromSystem(OSTHREAD_SIZE, 8);
-  bool ret = OSCreateThread(thread, OSFatal, (int)str, null, stack, 0x1000, 0, 1);
+  bool ret = OSCreateThread(thread, _Exit, (int)str, null, stack, 0x1000, 0, 1);
   if (ret == false)
   {
 	  OSFatal("Failed to create thread");
