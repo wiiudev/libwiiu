@@ -20,7 +20,7 @@ void _start()
 	//OS Thread functions
 	long(*OSCheckActiveThreads)();
 	//Misc OS functions
-	void(*OSRestartGame)();
+	void(*OSRestartGame)(int argc, char *argv[]);
 	//OS Memory functions
 	void(*DCFlushRange)(void *buffer, uint32_t length);
 	/****************************>             Exports             <****************************/
@@ -36,7 +36,7 @@ void _start()
 	OSDynLoad_FindExport(coreinit_handle, 0, "DCFlushRange", &DCFlushRange);
 	/****************************>          Initial Setup          <****************************/
 	//Restart the web browser. This stops active threads for browser. Browser GUI thread runs on CPU0.
-	OSRestartGame();
+	OSRestartGame(0, NULL);
 	//Wait for the web browser to start closing by observing the total number of threads.
 	long initialNumberOfThreads = OSCheckActiveThreads();
 	long currentNumberOfThreads = OSCheckActiveThreads();
