@@ -35,8 +35,7 @@ void _start()
   OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
 
   /* Create a string argument */
-  char *str = OSAllocFromSystem(6, 1);
-  _Exit();
+  char *str = OSAllocFromSystem(6, 4);
   str[0] = 'H';
   str[1] = 'e';
   str[2] = 'l';
@@ -50,7 +49,7 @@ void _start()
 
   /* Create the thread */
   void *thread = OSAllocFromSystem(OSTHREAD_SIZE, 8);
-  bool ret = OSCreateThread(thread, _Exit, (int)str, null, stack, 0x1000, 0, 1);
+  bool ret = OSCreateThread(thread, OSFatal, (int)str, null, stack, 0x1000, 0, 1);
   if (ret == false)
   {
 	  OSFatal("Failed to create thread");
