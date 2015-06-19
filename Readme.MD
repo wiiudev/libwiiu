@@ -12,9 +12,9 @@ Inside this repository, you will find a set of tools that allow you to compile y
 
 This repository contains a C build system, which allows you to compile your own C code and embed it inside a webpage to be executed on the Wii U. The webpage contains some Javascript code that triggers the WebKit bug and passes control to your C code. Running your own C code on the Wii U gives you full access to the SDK libraries. Any function's address can be retrieved if you know its symbol name and containing library's name (more on this below). Before using the C build system, you must have the following tools:
 
-* Unix-like shell environment (use Cygwin to get this on Windows)
-* devkitPPC (needed to compile and link the C code), with powerpc-eabi-xxx binaries in PATH
-* Python 3.x or 2.x
+* Unix-like shell environment (use [Cygwin](https://cygwin.com/install.html) to get this on Windows)
+* [devkitPPC](http://sourceforge.net/projects/devkitpro/) (needed to compile and link the C code), with `C:\devkitPro\devkitPPC\bin` added to `PATH`
+* [Python](https://www.python.org/downloads/) 3.x (must add `C:\Python34` to `PATH`) or 2.x
 
 #### Build Example ####
 The `osscreenexamples` folder contains projects using `OSScreen` and the `loader.c` from `libwiiu`. The `examples` folder does not use `OSScreen` and uses the `loader.c` in the `projects` local directory.
