@@ -17,7 +17,7 @@ void start()
 	ospanic_cb[0] = ospanic_cb[1] = 0;
 
 	/* Look for the code buffer */
-	unsigned int *codebuf = (unsigned int*)BUFFER_ADDR;
+	unsigned int *codebuf = (unsigned int*)(BUFFER_ADDR+0x96f00);
 	while (codebuf < (unsigned int*)0x20000000)
 	{
 		if (*codebuf == CODE_START) break;
