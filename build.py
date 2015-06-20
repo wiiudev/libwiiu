@@ -7,7 +7,7 @@ def main():
 	ar2=""
 	ar3=""
 	ver=""
-	rootDir=os.path.dirname(os.path.realpath(sys.argv[0]))
+	rootDir=os.getcwd()
 	frameworkDir=os.path.join(rootDir,"framework")
 	libsDir=os.path.join(rootDir,"libwiiu")
 	wwwDir=os.path.join(rootDir,"www")
