@@ -10,17 +10,17 @@ def main():
 	rootDir=os.getcwd()
 	frameworkDir=os.path.join(rootDir,"framework")
 	libsDir=os.path.join(rootDir,"libwiiu")
-	wwwDir=os.path.join(rootDir,"www")
 	try:
 		ar1=sys.argv[1]
 		ar1=sys.argv[2]
 	except:
 		pass
 	projectDir=os.path.join(rootDir,ar1)
+	wwwDir=os.path.join(rootDir,"www",os.path.basename(os.path.normpath(projectDir)))
 	platformStr=platform.system().lower()
 	print("Building for your "+platformStr+" platform...")
 	if not os.path.exists(wwwDir):
-	    os.mkdir(wwwDir)
+	    os.makedirs(wwwDir)
 	os.chdir(frameworkDir)
 	subprocess.call(['make'])
 	os.chdir(libsDir)
