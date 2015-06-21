@@ -136,10 +136,10 @@ def build_stack(ver,code):
 			value = int(value, 16)
 
 			if value == 0xCAFE4000:
-                                try: value = (code[0x4000] << 24) | (code[0x4001] << 16) | (code[0x4002] << 8) | code[0x4003]
+                                try: value = (code[0x3FFC] << 24) | (code[0x3FFD] << 16) | (code[0x3FFE] << 8) | code[0x3FFF]
                                 except IndexError: value = 0x4000
 			elif value == 0xCAFE7FFC:
-                                try: value = (code[0x7FFC] << 24) | (code[0x7FFD] << 16) | (code[0x7FFE] << 8) | code[0x7FFF]
+                                try: value = (code[0x7FF8] << 24) | (code[0x7FF9] << 16) | (code[0x7FFA] << 8) | code[0x7FFB]
                                 except IndexError: value = 0x7FFC
 
 			output.seek(addr)
