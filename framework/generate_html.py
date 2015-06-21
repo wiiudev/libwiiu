@@ -4,6 +4,7 @@ import struct
 import inspect
 import os
 import shutil
+import binascii
 
 buffer_addr = {
         '300': 0x1dd7b814,
@@ -52,12 +53,13 @@ def main():
 		ver=ar2
 	filename = inspect.getframeinfo(inspect.currentframe()).filename
 	path = os.path.dirname(os.path.abspath(filename))
-	stack = build_stack(ver)
+	code = open(ar1, 'rb').read()
+	stack = build_stack(ver,code)
 	findcode = open('{0}/bin/findcode{1}.bin'.format(path,ver), 'rb').read()
 	stack = stack[:shellcode_offset[ver]] + findcode + stack[shellcode_offset[ver] + len(findcode):]
 	
 	stack_js = stack_to_js(stack,ver)
-	code_js = code_to_js(open(ar1, 'rb').read())
+	code_js = code_to_js(code)
 
 	if ver == '532': template = open('{0}/html/template532.html'.format(path), 'r').read()
 	else: template = open('{0}/html/template.html'.format(path), 'r').read()
@@ -115,7 +117,7 @@ def code_to_js(code):
 	
 	return values_to_js(values)
 
-def build_stack(ver):
+def build_stack(ver,code):
 	filename = inspect.getframeinfo(inspect.currentframe()).filename
 	path = os.path.dirname(os.path.abspath(filename))
 	text = open('{0}/stack/stack{1}.txt'.format(path,ver)).read()
@@ -132,6 +134,13 @@ def build_stack(ver):
 		value = line.split()[-1]
 		if value.startswith('0x'):
 			value = int(value, 16)
+
+			if value == 0xCAFE4000:
+                                try: value = (code[0x4000] << 24) | (code[0x4001] << 16) | (code[0x4002] << 8) | code[0x4003]
+                                except IndexError: value = 0x4000
+			elif value == 0xCAFE7FFC:
+                                try: value = (code[0x7FFC] << 24) | (code[0x7FFD] << 16) | (code[0x7FFE] << 8) | code[0x7FFF]
+                                except IndexError: value = 0x7FFC
 
 			output.seek(addr)
 			output.write(struct.pack('>I', value))

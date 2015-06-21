@@ -88,6 +88,9 @@
 
 0x184 - ROP gadget #12 (JIT region)                                      0x1800000
 
+0x190 - Middle of code buffer (0x4000)                                   0xCAFE4000
+0x194 - End of code buffer (0x7ffc)                                      0xCAFE7FFC
+
 0x30c - 0                                                                0x0
 0x310 - Next pointer                                                     0x1b201b28
 0x314 - Stack pivot gadget                                               0x1043528
