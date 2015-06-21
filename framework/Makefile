@@ -3,8 +3,7 @@ CFLAGS=-nostdinc -fno-builtin -c
 LD=powerpc-eabi-ld
 LDFLAGS=-Ttext 1800000 --oformat binary
 
-override CURDIR:=$(shell cygpath -m $(CURDIR))
-root:=$(CURDIR)
+root:=.
 project	:=	$(root)/src
 build	:=	 $(root)/bin
 all: setup findcode532 findcode500 findcode410 findcode400 findcode300
