@@ -16,9 +16,13 @@ def main():
 		ar1=sys.argv[2]
 	except:
 		pass
+	wwwSubDir=ar1.split("/")
 	projectDir=os.path.join(rootDir,ar1)
 	platformStr=platform.system().lower()
 	print("Building for your "+platformStr+" platform...")
+	if not os.path.exists(wwwDir):
+	    os.mkdir(wwwDir)
+	wwwDir=os.path.join(wwwDir,wwwSubDir[len(wwwSubDir) - 1])
 	if not os.path.exists(wwwDir):
 	    os.mkdir(wwwDir)
 	os.chdir(frameworkDir)
