@@ -29,7 +29,7 @@ void start()
 			codebuf[0x7FFC/4] == ropbuf[0x194/4]) break;
 		codebuf++;
 	}
-	if (codebuf == 0x20000000) ((void (*)())0x101cd70)();
+	if (codebuf == 0x20000000) OSFatal("Code not found");
 
 	/* Modify the ROP buffer to copy the code spray into the JIT */
 	ropbuf[0x318/4] = &ropbuf[0xa0/4];
