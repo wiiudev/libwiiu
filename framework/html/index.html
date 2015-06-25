@@ -52,12 +52,32 @@
 					document.getElementById("text").innerHTML="Detected Wii U Firmware version 4.0.0";
 					window.location = "payload400.html";
 				}
-				-->See if browser is for Wii U version 3.0.0
+				-->See if browser is for Wii U version 3.0.0 or 3.1.0
 				else if (versionNumber == "2.1.0.10.9")
 				{
 					-->Display message and redirect to payload URL
-					document.getElementById("text").innerHTML="Detected Wii U Firmware version 3.0.0";
-					window.location = "payload300.html";
+					document.getElementById("text").innerHTML="Detected Wii U Firmware version 3.0.0 or 3.1.0";
+					var check = new XMLHttpRequest();
+					check.open('HEAD', "payload310.html", false);
+					check.send();
+					if (check.status != 404)
+						window.location = "payload310.html";
+					else
+						window.location = "payload300.html";
+				}
+				-->See if browser is for Wii U version 2.1.0
+				else if (versionNumber == "2.1.0.8.23")
+				{
+					-->Display message and redirect to payload URL
+					document.getElementById("text").innerHTML="Detected Wii U Firmware version 2.1.0";
+					window.location = "payload210.html";
+				}
+				-->See if browser is for Wii U version 2.0.0
+				else if (versionNumber == "2.1.0.8.21")
+				{
+					-->Display message and redirect to payload URL
+					document.getElementById("text").innerHTML="Detected Wii U Firmware version 2.0.0";
+					window.location = "payload200.html";
 				}
 			}
 			-->If we couldn't parse the browser version, throw an error message

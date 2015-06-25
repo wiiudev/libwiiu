@@ -1,7 +1,17 @@
 #ifndef COREINIT_H
 #define COREINIT_H
 
-#if (VER==300)
+#if (VER==200)
+#define OSDynLoad_Acquire ((void (*)(char* rpl, unsigned int *handle))0x010220AC)
+#define OSDynLoad_FindExport ((void (*)(unsigned int handle, int isdata, char *symbol, void *address))0x01022D98)
+#define OSFatal ((void (*)(char* msg))0x01027688)
+#define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x01025FB4)
+#elif (VER==210)
+#define OSDynLoad_Acquire ((void (*)(char* rpl, unsigned int *handle))0x0102232C)
+#define OSDynLoad_FindExport ((void (*)(unsigned int handle, int isdata, char *symbol, void *address))0x01023018)
+#define OSFatal ((void (*)(char* msg))0x01027908)
+#define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x01026234)
+#elif (VER==300) | (VER==310)
 #define OSDynLoad_Acquire ((void (*)(char* rpl, unsigned int *handle))0x01022CBC)
 #define OSDynLoad_FindExport ((void (*)(unsigned int handle, int isdata, char *symbol, void *address))0x01023D88)
 #define OSFatal ((void (*)(char* msg))0x01028A68)

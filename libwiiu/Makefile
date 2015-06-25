@@ -1,17 +1,19 @@
 CC=powerpc-eabi-gcc
 CFLAGS=-nostdinc -fno-builtin -c
-override CURDIR:=$(shell cygpath -m $(CURDIR))
-root	:= $(CURDIR)
+root:=.
 project := $(root)/src
 build	:=	$(root)/bin
-all: setup libwiiu532 libwiiu500 libwiiu410 libwiiu400 libwiiu300
+all: setup libwiiu532 libwiiu500 libwiiu410 libwiiu400 libwiiu310 libwiiu300 libwiiu210 libwiiu200
 
 setup:
 	mkdir -p $(root)/bin/532/
 	mkdir -p $(root)/bin/500/
 	mkdir -p $(root)/bin/410/
 	mkdir -p $(root)/bin/400/
+	mkdir -p $(root)/bin/310/
 	mkdir -p $(root)/bin/300/
+	mkdir -p $(root)/bin/210/
+	mkdir -p $(root)/bin/200/
 libwiiu532:
 	$(CC) $(CFLAGS) -DVER=532  $(project)/*.c
 	#-Wa,-a,-ad
@@ -32,10 +34,25 @@ libwiiu400:
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)/400
 	rm $(root)/*.o
+libwiiu310:
+	$(CC) $(CFLAGS) -DVER=310 $(project)/*.c
+	#-Wa,-a,-ad
+	cp -r $(root)/*.o $(build)/310
+	rm $(root)/*.o
 libwiiu300:
 	$(CC) $(CFLAGS) -DVER=300 $(project)/*.c
 	#-Wa,-a,-ad
 	cp -r $(root)/*.o $(build)/300
 	rm $(root)/*.o
+libwiiu210:
+	$(CC) $(CFLAGS) -DVER=210 $(project)/*.c
+	#-Wa,-a,-ad
+	cp -r $(root)/*.o $(build)/210
+	rm $(root)/*.o
+libwiiu200:
+	$(CC) $(CFLAGS) -DVER=200 $(project)/*.c
+	#-Wa,-a,-ad
+	cp -r $(root)/*.o $(build)/200
+	rm $(root)/*.o
 clean:
-	rm -r $(build)/532/* $(build)/500/* $(build)/410/* $(build)/400/* $(build)/300/*
+	rm -r $(build)/532/* $(build)/500/* $(build)/410/* $(build)/400/* $(build)/310/* $(build)/300/* $(build)/210/* $(build)/200/*

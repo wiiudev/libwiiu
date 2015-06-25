@@ -254,8 +254,8 @@ Heap Buffer Layout												Value
 0x494 - Function epilogue gadget								0x0E6CE574
 0x498 - Function epilogue gadget								0x0E6CE574
 0x49C - Function epilogue gadget								0x0E6CE574
-0x4CC - OSSwitchSecCodeGenMode()								0x0102C2F4
-0x4D0 - memcpy()												0x0102B5A8
+0x4CC - OSSwitchSecCodeGenMode()								0x0102C374
+0x4D0 - memcpy()												0x0102B5C8
 0x4D4 - DCFlushRange()											0x0101DA3C
 0x4D8 - ICInvalidateRange()										0x0101DB64
 0x4DC - Stack pivot gadget										0x0E937BD0
