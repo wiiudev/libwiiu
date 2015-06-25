@@ -1,6 +1,10 @@
 # README #
 
-This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only. Right now, the supported versions are 3.x.x, 4.0.x, 4.1.0, 5.0.0, 5.1.0 and 5.3.2).
+This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only. Right now, almost all firmware versions are compatible:
+* Firmware versions 2.0.0 (first instalment of the Internet Browser) to 5.1.0 are supported by exploiting an use-after-free bug (CVE-2013-2842).
+* Firmware version 5.3.2 is supported by exploiting a memory corruption bug (CVE-2014-1300).
+* Firmware versions 5.1.1 to 5.3.1 are also supported, but currently unimplemented.
+* Firmware version 5.4.0 is not supported yet.
 
 ### What's inside? ###
 
@@ -52,10 +56,12 @@ Next, start `rpc.py` in an interactive Python session (IDLE or IPython is a good
 
 ### Credits ###
 
-* Marionumber1 - ROP chain design/implementation
-* TheKit - WebKit bug finding, ROP chain implementation
-* Hykem - Finding ROP gadgets
-* bubba - Testing WebKit bug candidates
-* comex - Access to the `coreinit` and WebKit binaries
-* Chadderz - Blind memory dumping on 5.0.0
-* Relys - Testing exploits. Complete refactor of exploit framework, build process and scripts. `OSResetGame` trick to use `OSScreen` functions.
+* Marionumber1
+* TheKit
+* Hykem
+* bubba
+* comex
+* Chadderz
+* Relys
+* NWPlayer123
+* Mathew_Wi
