@@ -1,6 +1,8 @@
 # README #
 
-This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only. Right now, almost all firmware versions are compatible:
+This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only.
+
+Right now, almost all firmware versions are compatible:
 * Firmware versions 2.0.0 (first instalment of the Internet Browser) to 5.1.0 are supported by exploiting an use-after-free bug (CVE-2013-2842).
 * Firmware version 5.3.2 is supported by exploiting a memory corruption bug (CVE-2014-1300).
 * Firmware versions 5.1.1 to 5.3.1 are also supported, but currently unimplemented.
