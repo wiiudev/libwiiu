@@ -16,4 +16,4 @@ struct sockaddr
 };
 
 /* IP address of the RPC client (in this case, 192.168.1.9) */
-#define PC_IP	( (192<<24) | (168<<16) | (1<<8) | (9<<0) )
+#define PC_IP	0xC0A80109
