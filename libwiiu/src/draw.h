@@ -5,7 +5,7 @@
 //Function declarations for my graphics library
 void flipBuffers();
 void fillScreen(char r, char g, char b, char a);
-void drawString(int x, int y, char * string);
+void drawString(int x, int line, char * string);
 void drawPixel(int x, int y, char r, char g, char b, char a);
 void drawLine(int x1, int y1, int x2, int y2, char r, char g, char b, char a);
 void drawRect(int x1, int y1, int x2, int y2, char r, char g, char b, char a);
