@@ -17,10 +17,6 @@ void _start()
 	void(*OSScreenInit)();
 	unsigned int(*OSScreenGetBufferSizeEx)(unsigned int bufferNum);
 	unsigned int(*OSScreenSetBufferEx)(unsigned int bufferNum, void * addr);
-	//OS Thread functions
-	void(*OSSleepTicks)(signed long long ticks);
-	//Misc OS functions
-	unsigned int*(*OSGetSystemInfo)(void);
 	//OS Memory functions
 	void*(*memset)(void * dest, uint32_t value, uint32_t bytes);
 	void*(*OSAllocFromSystem)(uint32_t size, int align);
@@ -28,15 +24,12 @@ void _start()
 	//IM functions
 	int(*IM_Open)();
 	int(*IM_Close)(int fd);
-	int(*IM_SetDeviceState)(int fd, void *mem, int state, int a, int b);	/****************************>             Exports             <****************************/
+	int(*IM_SetDeviceState)(int fd, void *mem, int state, int a, int b);
+	/****************************>             Exports             <****************************/
 	//OSScreen functions
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenInit", &OSScreenInit);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenGetBufferSizeEx", &OSScreenGetBufferSizeEx);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenSetBufferEx", &OSScreenSetBufferEx);
-	//OSThread functions
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSSleepTicks", &OSSleepTicks);
-	//Misc OS functions
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSGetSystemInfo", &OSGetSystemInfo);
 	//OS Memory functions
 	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
@@ -54,8 +47,9 @@ void _start()
 	IM_SetDeviceState(fd, mem, 3, 0, 0); 
 	IM_Close(fd);
 	OSFreeToSystem(mem);
-	//wait 2 secs for browser end
-	OSSleepTicks((*OSGetSystemInfo()) / 2);
+	//wait a bit for browser end
+	unsigned int t1 = 0x1FFFFFFF;
+	while(t1--) ;
 	//Call the Screen initilzation function.
 	OSScreenInit();
 	//Grab the buffer size for each screen (TV and gamepad)
