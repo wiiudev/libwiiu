@@ -22,14 +22,14 @@ void flipBuffers()
 	OSScreenFlipBuffersEx(1);
 }
 
-void drawString(int x, int y, char * string)
+void drawString(int x, int line, char * string)
 {
 	unsigned int coreinit_handle;
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
-	unsigned int(*OSScreenPutFontEx)(unsigned int bufferNum, unsigned int posX, unsigned int posY, void * buffer);
+	unsigned int(*OSScreenPutFontEx)(unsigned int bufferNum, unsigned int posX, unsigned int line, void * buffer);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenPutFontEx", &OSScreenPutFontEx);
-	OSScreenPutFontEx(0, x, y, string);
-	OSScreenPutFontEx(1, x, y, string);
+	OSScreenPutFontEx(0, x, line, string);
+	OSScreenPutFontEx(1, x, line, string);
 }
 
 void fillScreen(char r,char g,char b,char a)

@@ -25,6 +25,10 @@ void _entryPoint()
 	flags.x=0;
 	flags.a=0;
 	flags.b=0;
+	__os_snprintf(flags.aPressed, 32, "A button pressed");
+	__os_snprintf(flags.bPressed, 32, "B button pressed");
+	__os_snprintf(flags.xPressed, 32, "X button pressed");
+	__os_snprintf(flags.yPressed, 32, "Y button pressed");
 	/****************************>            VPAD Loop            <****************************/
 
 	/* Enter the VPAD loop */
@@ -39,48 +43,24 @@ void _entryPoint()
 
 		//button A
 		if (vpad_data.btn_hold & BUTTON_A)
-		{
-			flags.y=0;
-			flags.x=0;
 			flags.a=1;
-			flags.b=0;
-			__os_snprintf(flags.output, 1000, "A button pressed");
-		}
 	
 		//button B
-		else if (vpad_data.btn_hold & BUTTON_B)
-		{
-			flags.y=0;
-			flags.x=0;
-			flags.a=0;
+		if (vpad_data.btn_hold & BUTTON_B)
 			flags.b=1;
-			__os_snprintf(flags.output, 1000, "B button pressed");
-		}
-	
+
 		//button X
-		else if (vpad_data.btn_hold & BUTTON_X)
-		{
-			flags.y=0;
+		if (vpad_data.btn_hold & BUTTON_X)
 			flags.x=1;
-			flags.a=0;
-			flags.b=0;
-			__os_snprintf(flags.output, 1000, "X button pressed");
-		}
-	
+
 		//button Y
-		else if (vpad_data.btn_hold & BUTTON_Y)
-		{
+		if (vpad_data.btn_hold & BUTTON_Y)
 			flags.y=1;
-			flags.x=0;
-			flags.a=0;
-			flags.b=0;
-			__os_snprintf(flags.output, 1000, "Y button pressed");
-		}
-		
+
+		//end
 		if(vpad_data.btn_hold & BUTTON_HOME)
-		{
-		break;
-		}
+			break;
+
 		render(&flags);
 	}
 	//WARNING: DO NOT CHANGE THIS. YOU MUST CLEAR THE FRAMEBUFFERS AND IMMEDIATELY CALL EXIT FROM THIS FUNCTION. RETURNING TO LOADER CAUSES FREEZE.
@@ -98,26 +78,15 @@ void render(struct renderFlags *flags)
 	int i=0;
 	for(i;i<2;i++)
 	{
-		if(flags->y)
-		{
 		fillScreen(0,0,0,0);
-		drawString(0,0,flags->output);
-		}
-		if(flags->x)
-		{
-		fillScreen(0,0,0,0);
-		drawString(0,0,flags->output);
-		}
 		if(flags->a)
-		{
-		fillScreen(0,0,0,0);
-		drawString(0,0,flags->output);
-		}
+			drawString(0,0,flags->aPressed);
 		if(flags->b)
-		{
-		fillScreen(0,0,0,0);
-		drawString(0,0,flags->output);
-		}
+			drawString(0,1,flags->bPressed);
+		if(flags->x)
+			drawString(0,2,flags->xPressed);
+		if(flags->y)
+			drawString(0,3,flags->yPressed);
 		flipBuffers();
 	}
 	flags->a=0;

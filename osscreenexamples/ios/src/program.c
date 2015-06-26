@@ -84,7 +84,6 @@ void _entryPoint()
 			flags.x=0;
 			flags.a=1;
 			flags.b=0;
-			char buffer[256];
 			__os_snprintf(flags.output, 1000, "/dev/slc: %d\n/dev/mlc: %d\n/dev/wfs: %d\n/dev/di: %d\n/dev/atfs: %d\n/dev/mcp: %d\n/dev/crypto: %d\n/dev/drh: %d\n/dev/usb/drh: %d\n/dev/fat: %d\n/dev/odm: %d\n/dev/ppc_kernel: %d\n/dev/ppc_app: %d\n/dev/dk: %d\n/dev/mcp_recovery: %d\n/dev/smd: %d\n/dev/ipc: %d", slc, mlc, wfs, di, atfs, mcp, crypto, drh, usbdrh, slot0,odm,ppc_kernel,ppc_app,dk,mcp_recovery,smd,ipc);
 		}
 	
@@ -95,6 +94,7 @@ void _entryPoint()
 			flags.x=0;
 			flags.a=0;
 			flags.b=1;
+			__os_snprintf(flags.output, 1000, "B button pressed");
 		}
 	
 		//button X
