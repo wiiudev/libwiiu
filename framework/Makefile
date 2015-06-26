@@ -73,7 +73,7 @@ ifeq ("$(wildcard $(build)/findcode400.bin)","")
 	dd if=$(build)/findcode400.bin of=$(build)/stack400.bin obs=352 seek=1 conv=notrunc
 endif
 findcode310:
-ifeq ("$(wildcard $(build)/findcode300.bin)","")
+ifeq ("$(wildcard $(build)/findcode310.bin)","")
 	# Build findcode
 	$(CC) $(CFLAGS) -DVER=310+ $(project)/findcode310.c
 	#-Wa,-a,-ad
