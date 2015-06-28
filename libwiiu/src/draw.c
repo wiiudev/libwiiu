@@ -1,7 +1,5 @@
 #include "draw.h"
 
-int drawing_screens = SCREEN_ALL;
-
 void flipBuffers()
 {
 	unsigned int coreinit_handle;
@@ -17,15 +15,11 @@ void flipBuffers()
 	int buf0_size = OSScreenGetBufferSizeEx(0);
 	int buf1_size = OSScreenGetBufferSizeEx(1);
 	//Flush the cache
-	if(drawing_screens & SCREEN_TV)
-		DCFlushRange((void *)0xF4000000 + buf0_size, buf1_size);
-	if(drawing_screens & SCREEN_GAMEPAD)
-		DCFlushRange((void *)0xF4000000, buf0_size);
+	DCFlushRange((void *)0xF4000000 + buf0_size, buf1_size);
+	DCFlushRange((void *)0xF4000000, buf0_size);
 	//Flip the buffer
-	if(drawing_screens & SCREEN_TV)
-		OSScreenFlipBuffersEx(0);
-	if(drawing_screens & SCREEN_GAMEPAD)
-		OSScreenFlipBuffersEx(1);
+	OSScreenFlipBuffersEx(0);
+	OSScreenFlipBuffersEx(1);
 }
 
 void drawString(int x, int line, char * string)
@@ -34,10 +28,8 @@ void drawString(int x, int line, char * string)
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
 	unsigned int(*OSScreenPutFontEx)(unsigned int bufferNum, unsigned int posX, unsigned int line, void * buffer);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenPutFontEx", &OSScreenPutFontEx);
-	if(drawing_screens & SCREEN_TV)
-		OSScreenPutFontEx(0, x, line, string);
-	if(drawing_screens & SCREEN_GAMEPAD)
-		OSScreenPutFontEx(1, x, line, string);
+	OSScreenPutFontEx(0, x, line, string);
+	OSScreenPutFontEx(1, x, line, string);
 }
 
 void fillScreen(char r,char g,char b,char a)
@@ -47,10 +39,8 @@ void fillScreen(char r,char g,char b,char a)
 	unsigned int(*OSScreenClearBufferEx)(unsigned int bufferNum, unsigned int temp);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenClearBufferEx", &OSScreenClearBufferEx);
 	uint32_t num = (r << 24) | (g << 16) | (b << 8) | a;
-	if(drawing_screens & SCREEN_TV)
-		OSScreenClearBufferEx(0, num);
-	if(drawing_screens & SCREEN_GAMEPAD)
-		OSScreenClearBufferEx(1, num);
+	OSScreenClearBufferEx(0, num);
+	OSScreenClearBufferEx(1, num);
 }
 
 //Rendering in 
@@ -61,10 +51,8 @@ void drawPixel(int x, int y, char r, char g, char b, char a)
 	unsigned int (*OSScreenPutPixelEx)(unsigned int bufferNum, unsigned int posX, unsigned int posY, uint32_t color);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenPutPixelEx", &OSScreenPutPixelEx);
 	uint32_t num = (r << 24) | (g << 16) | (b << 8) | a;
-	if(drawing_screens & SCREEN_TV)
-		OSScreenPutPixelEx(0,x,y,num);
-	if(drawing_screens & SCREEN_GAMEPAD)
-		OSScreenPutPixelEx(1,x,y,num);
+	OSScreenPutPixelEx(0,x,y,num);
+	OSScreenPutPixelEx(1,x,y,num);
 	//Code to write to framebuffer directly. For some reason this is only writing to one of the framebuffers when calling flipBuffers. Should provide speedup but needs investigation.
 	/*
 	unsigned int coreinit_handle;
@@ -200,8 +188,4 @@ void drawCircleCircum(int cx, int cy, int x, int y, char r, char g, char b, char
 		drawPixel(cx + y, cy - x, r, g, b, a);
 		drawPixel(cx - y, cy - x, r, g, b, a);
 	}
-}
-
-void setDrawingScreens(int screens) {
-	drawing_screens = screens;
 }
