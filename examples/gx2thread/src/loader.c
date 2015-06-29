@@ -224,5 +224,5 @@ void setupColorBuffer(GX2ColorBuffer *colorBuffer, unsigned int gx2_handle)
 	OSDynLoad_FindExport(gx2_handle, 0, "GX2InitColorBufferRegs", &GX2InitColorBufferRegs);
     GX2InitColorBufferRegs(colorBuffer);
 	//DAMN thats dirty, ignore plz!
-	colorBuffer->surface.imagePtr = (void*)((0xF6000000-colorBuffer->surface.imageSize)&~colorBuffer->surface.alignment);
+	colorBuffer->surface.imagePtr = (void*)((0xF6000000-colorBuffer->surface.imageSize)&(~(colorBuffer->surface.alignment-1)));
 }
