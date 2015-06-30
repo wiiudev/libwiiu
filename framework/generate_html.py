@@ -65,7 +65,7 @@ def main():
 		ver=ar2
 	filename = inspect.getframeinfo(inspect.currentframe()).filename
 	path = os.path.dirname(os.path.abspath(filename))
-	code = open(ar1, 'rb').read()
+	code = bytearray(open(ar1, 'rb').read())
 	stack = build_stack(ver,code)
 	findcode = open('{0}/bin/findcode{1}.bin'.format(path,ver), 'rb').read()
 	stack = stack[:shellcode_offset[ver]] + findcode + stack[shellcode_offset[ver] + len(findcode):]
