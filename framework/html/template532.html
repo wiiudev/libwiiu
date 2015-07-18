@@ -49,7 +49,7 @@ function sprayCode(n) {
 function uint32(value){
   var s = '';
   for (var i = 0; i < 4; i++) {
-    s += String.fromCharCode((value >> (i * 2)) & 0xff);
+    s += String.fromCharCode((value >> (i * 4)) & 0xff);
   }
   return s;
 }
