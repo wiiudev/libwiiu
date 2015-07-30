@@ -67,6 +67,7 @@ def rootIndexGen(wwwDir):
 	f = open(os.path.join(wwwDir,'index.html'), 'w')
 	#Write html header and body tags
 	f.write("<html>\n<head>\n\t</head>\n\t<body>\n")
+	f.write("""<style type='text/css'>a { display: block; padding:20px; margin:10px; border: 1px solid; width:33%; float:left; }</style>""")
 	#Get list of all project subdirs inside root www dir.
 	for subdir in subDirPath(wwwDir):
 		#get a list of all payload files for each project.
@@ -88,7 +89,7 @@ def rootIndexGen(wwwDir):
 		for versionNumber in versionsSupported[:-1]:
 			f.write(versionNumber+",")
 		f.write(versionsSupported[-1])
-		f.write(")</a>\n<br>")
+		f.write(")</a>\n")
 	#Write closing html tags.
 	f.write("\t</body>\n</html>")
 	
