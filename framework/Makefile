@@ -1,6 +1,6 @@
-CC=powerpc-eabi-gcc
+CC=$(DEVKITPPC)/bin/powerpc-eabi-gcc
 CFLAGS=-nostdinc -fno-builtin -c
-LD=powerpc-eabi-ld
+LD=$(DEVKITPPC)/bin/powerpc-eabi-ld
 LDFLAGS=-Ttext 1800000 --oformat binary
 
 root:=.
