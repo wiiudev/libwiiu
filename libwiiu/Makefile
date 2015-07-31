@@ -1,4 +1,4 @@
-CC=powerpc-eabi-gcc
+CC=$(DEVKITPPC)/bin/powerpc-eabi-gcc
 CFLAGS=-nostdinc -fno-builtin -c
 root:=.
 project := $(root)/src
