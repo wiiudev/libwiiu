@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 CC=$(DEVKITPPC)/bin/powerpc-eabi-gcc
 CFLAGS=-nostdinc -fno-builtin -c
 LD=$(DEVKITPPC)/bin/powerpc-eabi-ld
