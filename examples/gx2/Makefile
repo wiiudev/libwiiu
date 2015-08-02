@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 CC=$(DEVKITPPC)/bin/powerpc-eabi-gcc
 CFLAGS=-nostdinc -fno-builtin -c
 LD=$(DEVKITPPC)/bin/powerpc-eabi-ld
+=======
+CC=powerpc-eabi-gcc
+CFLAGS=-std=gnu99 -nostdinc -fno-builtin -c
+LD=powerpc-eabi-ld
+>>>>>>> 326544a90ca2c66a7c14e48e5c1f2f0b7564983c
 LDFLAGS=-Ttext 1800000 --oformat binary
 project	:=	src
 root:=.

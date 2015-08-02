@@ -1,7 +1,7 @@
 #define __PPCExit ((void (*)())0x01018940)
 #define OSFatal ((void (*)(char* msg))0x01027908)
-#define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x01026234)
-#define rop ((void (*)())0x0E65E8F4)
+#define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x01026014)
+#define rop ((void (*)())0x0E6C3A44)
 #define memcpy ((void * (*)(void * destination, const void * source, int num))0x01029E84)
 
 #define BUFFER_ADDR 0x1dd7b814

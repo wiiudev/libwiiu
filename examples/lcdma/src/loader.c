@@ -71,6 +71,7 @@ void _start()
 	
 	//Get some locked cache address space
 	void *lc_addr=LCAlloc(512); //512 Minmum. Must be multiple of 512.
+	__os_snprintf(output+strlen(output), 255, "LC buf: %08X",lc_addr);
 	
 	//Calculate size from blocks to flush/invalidate range properly
 	uint32_t size;
