@@ -80,7 +80,7 @@ def rootIndexGen(wwwDir):
 			search=re.search('payload(.*?).html', fileName)
 			#If payload file is found
 			if search:
-				#Extract just the version number and at it to versionsSupported list.
+				#Extract just the version number and add it to versionsSupported list.
 				payloadVersion=search.group(1)
 				versionsSupported.append(payloadVersion)
 		#Write project index in root index file.
