@@ -1,6 +1,8 @@
 #ifndef COREINIT_H
 #define COREINIT_H
 
+#include "types.h"
+
 #if (VER==200)
 #define OSDynLoad_Acquire ((void (*)(char* rpl, unsigned int *handle))0x010220AC)
 #define OSDynLoad_FindExport ((void (*)(unsigned int handle, int isdata, char *symbol, void *address))0x01022D98)
@@ -42,5 +44,25 @@ struct iovec
 	int len;
 	char unknown8[0xc-0x8];
 };
+
+typedef struct OSContext
+{
+	/* OSContext identifier */
+    uint32_t tag1;
+    uint32_t tag2;
+
+    /* GPRs */
+    uint32_t gpr[32];
+
+	/* Special registers */
+    uint32_t cr;
+    uint32_t lr;
+    uint32_t ctr;
+    uint32_t xer;
+
+    /* Initial PC and MSR */
+    uint32_t srr0;
+    uint32_t srr1;
+} OSContext;
 
 #endif /* COREINIT_H */
