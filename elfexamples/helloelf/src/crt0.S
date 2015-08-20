@@ -7,7 +7,7 @@
 	.globl _start
 _start:
 	# Setup stack.
-#	lis 1,_stack_top@ha ; addi 1,1,_stack_top@l ; li 0,0 ; stwu 0,-64(1)
+	lis 1,_stack_top@ha ; addi 1,1,_stack_top@l ; li 0,0 ; stwu 0,-64(1)
 
 	# Clear BSS.
 	lis 3,__bss_start@ha ; addi 3,3,__bss_start@l
@@ -17,4 +17,6 @@ _start:
 
 	bl _doInit
 	bl _main
+	# Return to old stack for exit
+	lis 1, 0x1ab5 ; ori 1, 1, 0xd138
 	bl _doExit
