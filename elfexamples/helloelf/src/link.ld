@@ -15,7 +15,7 @@ SECTIONS {
 
 	__rx_end = .;
 
-	. = 0xF5000000;
+	. = 0xF4C00000;
 
 	__rw_start = .;
 

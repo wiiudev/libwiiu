@@ -28,8 +28,9 @@ export OBJCOPY	:=	$(PREFIX)objcopy
 #---------------------------------------------------------------------------------
 TARGET		:=	boot
 BUILD		:=	build
+BUILD_DBG	:=	$(BUILD)_dbg
 SOURCES		:=	src
-DATA		:=	data  
+DATA		:=	data
 INCLUDES	:=
 
 #---------------------------------------------------------------------------------
@@ -129,8 +130,8 @@ $(OUTPUT).elf: $(OFILES)
 #---------------------------------------------------------------------------------
 %.elf: link.ld $(OFILES)
 	@echo "linking ... $(TARGET).elf"
-	$(Q)$(CC) -n -T $^ $(LDFLAGS) -o $@
-	$(Q)$(OBJCOPY) -S -R .comment -R .gnu.attributes $@
+	$(Q)$(CC) -n -T $^ $(LDFLAGS) -o ../$(BUILD_DBG).elf
+	$(Q)$(OBJCOPY) -S -R .comment -R .gnu.attributes ../$(BUILD_DBG).elf $@
 
 %.o: %.c 
 	@echo "$@"

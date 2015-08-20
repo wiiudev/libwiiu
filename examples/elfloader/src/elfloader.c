@@ -25,7 +25,7 @@ int valid_elf_image ()
 {
 	Elf32_Ehdr *ehdr; /* Elf header structure pointer */
 
-	ehdr = (Elf32_Ehdr *) 0xF5000000;
+	ehdr = (Elf32_Ehdr *) 0xF5800000;
 
 	if (!IS_ELF (*ehdr))
 		return 0;
@@ -50,7 +50,7 @@ void load_elf_image () {
 	Elf32_Phdr *phdrs;
 	unsigned char *image;
 
-	unsigned int elfstart = 0xF5000000;
+	unsigned int elfstart = 0xF5800000;
 	ehdr = (Elf32_Ehdr *) elfstart;
 
 	if(ehdr->e_phoff == 0 || ehdr->e_phnum == 0)

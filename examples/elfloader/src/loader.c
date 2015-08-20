@@ -115,7 +115,8 @@ int write_data(void *buffer, int size, int nmemb, void *userp)
 {
 	int *filepos = (int*)0xF5FFFFFC;
 	int insize = size*nmemb;
-	memcpy((void*)0xF5000000+(*filepos), buffer, insize);
+	if((*filepos)+insize > 0x7FFFFC) doexit();
+	memcpy((void*)0xF5800000+(*filepos), buffer, insize);
 	(*filepos) += insize;
 	return insize;
 }
@@ -175,7 +176,7 @@ void myMemThread(int sth1, int *sth2)
 
 	/* Do error checks */
 	int datalen = *(int*)0xF5FFFFFC;
-	if(!datalen || datalen > 0x1000000) doexit();
+	if(!datalen || datalen > 0x7FFFFC) doexit();
 
 	void(*curl_easy_getinfo)(void *handle, unsigned int param, void *op);
 	OSDynLoad_FindExport(libcurl_handle, 0, "curl_easy_getinfo", &curl_easy_getinfo);
