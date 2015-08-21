@@ -3,6 +3,7 @@
 /* Start of our code */
 void _start()
 {
+	*/Notify the user if the kernel version is not implemented*/
 	if(KERN_SYSCALL_TBL == 0)
 	{
 		OSFatal("Version not implemented!");
