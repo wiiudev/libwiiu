@@ -3,6 +3,11 @@
 /* Start of our code */
 void _start()
 {
+	if(KERN_SYSCALL_TBL == 0)
+	{
+		OSFatal("Version not implemented!");
+	}
+	
 	/* Load a good stack */
 	asm(
 		"lis %r1, 0x1ab5 ;"
