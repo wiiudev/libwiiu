@@ -6,7 +6,7 @@ void _start()
 	*/ Notify the user if the kernel version is not implemented */
 	if(KERN_SYSCALL_TBL == 0)
 	{
-		OSFatal("Version not implemented!");
+		OSFatal("Your kernel version has not been implemented yet");
 	}
 	
 	/* Load a good stack */
