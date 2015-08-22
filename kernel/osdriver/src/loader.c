@@ -3,6 +3,12 @@
 /* Start of our code */
 void _start()
 {
+	/* Notify the user if the kernel version is not implemented */
+	if(KERN_SYSCALL_TBL == 0)
+	{
+		OSFatal("Your kernel version has not been implemented yet");
+	}
+	
 	/* Load a good stack */
 	asm(
 		"lis %r1, 0x1ab5 ;"
