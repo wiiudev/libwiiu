@@ -7,7 +7,7 @@
 
 /* Wait times for CPU0 and CPU2 */
 #define CPU0_WAIT_TIME		80
-#define CPU2_WAIT_TIME		90
+#define CPU2_WAIT_TIME		92
 
 /* Gadget finding addresses */
 #define JIT_ADDRESS			        0x01800000

