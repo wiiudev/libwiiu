@@ -3,8 +3,7 @@ CFLAGS=-std=gnu99 -nostdinc -fno-builtin -c
 LD=powerpc-eabi-ld
 LDFLAGS=-Ttext 1800000 --oformat binary
 project	:=	src
-override CURDIR:=$(shell cygpath -m $(CURDIR))
-root:=$(CURDIR)
+root:=.
 build	:=	 $(root)/bin
 libs := $(root)/../../libwiiu/bin
 www :=$(root)/../../www

