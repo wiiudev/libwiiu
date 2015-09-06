@@ -1,4 +1,5 @@
-CC=$(DEVKITPPC)/bin/powerpc-eabi-gcc
+export PATH	:=	$(DEVKITPPC)/bin:$(PATH)
+CC=powerpc-eabi-gcc
 CFLAGS=-nostdinc -fno-builtin -c
 root:=.
 project := $(root)/src

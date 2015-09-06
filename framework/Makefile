@@ -1,6 +1,7 @@
-CC=$(DEVKITPPC)/bin/powerpc-eabi-gcc
+export PATH	:=	$(DEVKITPPC)/bin:$(PATH)
+CC=powerpc-eabi-gcc
 CFLAGS=-nostdinc -fno-builtin -c
-LD=$(DEVKITPPC)/bin/powerpc-eabi-ld
+LD=powerpc-eabi-ld
 LDFLAGS=-Ttext 1800000 --oformat binary
 
 root:=.

@@ -1,5 +1,6 @@
+export PATH	:=	$(DEVKITPPC)/bin:$(PATH)
 CC=powerpc-eabi-gcc
-CFLAGS=-nostdinc -fno-builtin -c
+CFLAGS=-std=gnu99 -nostdinc -fno-builtin -c
 LD=powerpc-eabi-ld
 LDFLAGS=-Ttext 1800000 --oformat binary
 project	:=	src
