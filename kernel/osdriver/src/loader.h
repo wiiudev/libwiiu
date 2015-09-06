@@ -7,11 +7,11 @@
 
 /* Wait times for CPU0 and CPU2 */
 #define CPU0_WAIT_TIME		80
-#define CPU2_WAIT_TIME		90
+#define CPU2_WAIT_TIME		92
 
 /* Gadget finding addresses */
 #define JIT_ADDRESS			        0x01800000
-#if VER == 300
+#if (VER == 300 || VER == 310)
 	#define CODE_ADDRESS_START		0x0E000000
 	#define CODE_ADDRESS_END		0x10000000
 #else
@@ -21,17 +21,17 @@
 
 /* Kernel addresses, for each new kernel */
 #if VER == 200
-	#define KERN_SYSCALL_TBL		0x0
-	#define KERN_CODE_READ			0x0
-	#define KERN_CODE_WRITE			0x0
-	#define KERN_ADDRESS_TBL		0x0
-	#define KERN_HEAP				0x0
+	#define KERN_SYSCALL_TBL		0xFFE85910
+	#define KERN_CODE_READ			0xFFF02214
+	#define KERN_CODE_WRITE			0xFFF02234
+	#define KERN_ADDRESS_TBL		0xFFEB4E00
+	#define KERN_HEAP				0xFF200000
 #elif VER == 210
-	#define KERN_SYSCALL_TBL		0x0
-	#define KERN_CODE_READ			0x0
-	#define KERN_CODE_WRITE			0x0
-	#define KERN_ADDRESS_TBL		0x0
-	#define KERN_HEAP				0x0
+	#define KERN_SYSCALL_TBL		0xFFE85910
+	#define KERN_CODE_READ			0xFFF02214
+	#define KERN_CODE_WRITE			0xFFF02234
+	#define KERN_ADDRESS_TBL		0xFFEB4E40
+	#define KERN_HEAP				0xFF200000
 #elif VER == 300
 	#define KERN_SYSCALL_TBL		0xFFE85950
 	#define KERN_CODE_READ			0xFFF02214
@@ -39,17 +39,17 @@
 	#define KERN_ADDRESS_TBL		0xFFEB66E4
 	#define KERN_HEAP				0xFF200000
 #elif VER == 310
-	#define KERN_SYSCALL_TBL		0x0
-	#define KERN_CODE_READ			0x0
-	#define KERN_CODE_WRITE			0x0
-	#define KERN_ADDRESS_TBL		0x0
-	#define KERN_HEAP				0x0
+	#define KERN_SYSCALL_TBL		0xFFE85950
+	#define KERN_CODE_READ			0xFFF02214
+	#define KERN_CODE_WRITE			0xFFF02234
+	#define KERN_ADDRESS_TBL		0xFFEB66E4
+	#define KERN_HEAP				0xFF200000
 #elif VER == 400
-	#define KERN_SYSCALL_TBL		0x0
-	#define KERN_CODE_READ			0x0
-	#define KERN_CODE_WRITE			0x0
-	#define KERN_ADDRESS_TBL		0x0
-	#define KERN_HEAP				0x0
+	#define KERN_SYSCALL_TBL		0xFFE85890
+	#define KERN_CODE_READ			0xFFF02214
+	#define KERN_CODE_WRITE			0xFFF02234
+	#define KERN_ADDRESS_TBL		0xFFEB7E5C
+	#define KERN_HEAP				0xFF200000
 #elif VER == 410
 	#define KERN_SYSCALL_TBL		0xffe85890
 	#define KERN_CODE_READ			0xfff02214

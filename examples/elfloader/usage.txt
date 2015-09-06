@@ -1,0 +1,8 @@
+Step 1:
+Compile this elfloader like every other example with "build.py".
+Step 2:
+Go into a elfexamples folder and compile that with "make".
+Step 3:
+Copy the resulting boot.elf into the www/elfloader folder.
+You can rename the elfloader folder to whatever you want
+on your webserver, it'll automatically generate the address.

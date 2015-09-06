@@ -80,18 +80,20 @@ def rootIndexGen(wwwDir):
 			search=re.search('payload(.*?).html', fileName)
 			#If payload file is found
 			if search:
-				#Extract just the version number and at it to versionsSupported list.
+				#Extract just the version number and add it to versionsSupported list.
 				payloadVersion=search.group(1)
 				versionsSupported.append(payloadVersion)
-		#Write project index in root index file.
-		f.write("\t<a href=\""+os.path.basename(subdir)+"\\index.html\">"+os.path.basename(subdir).replace('_',' ').title()+" (")
-		#Add version numbers supported for project.
-		for versionNumber in versionsSupported[:-1]:
-			f.write(versionNumber+",")
-		f.write(versionsSupported[-1])
-		f.write(")</a>\n")
-	#Write closing html tags.
-	f.write("\t</body>\n</html>")
+		#Check that project isn't empty
+		if len(versionsSupported) > 0:
+			#Write project index in root index file.
+			f.write("\t<a href=\""+os.path.basename(subdir)+"\\index.html\">"+os.path.basename(subdir).replace('_',' ').title()+" (")
+			#Add version numbers supported for project.
+			for versionNumber in versionsSupported[:-1]:
+				f.write(versionNumber+",")
+			f.write(versionsSupported[-1])
+			f.write(")</a>\n")
+		#Write closing html tags.
+		f.write("\t</body>\n</html>")
 	
 def subDirPath (d):
     return filter(os.path.isdir, [os.path.join(d,f) for f in os.listdir(d)])
