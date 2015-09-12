@@ -21,17 +21,17 @@ void _start()
 	int num_ifs = UhsQueryInterfaces(uhs_handle, &filter, &profiles[0], 4);
 	if (num_ifs <= 0) OSFatal("No USB interfaces detected");
 
-	/* Find a mass storage interface */
+	/* Find an audio interface */
 	UhsInterfaceProfile *iface_stor = NULL;
 	for (int i = 0; i < 4; i++)
 	{
-		if (profiles[i].if_desc.bInterfaceClass == USBCLASS_STORAGE)
+		if (profiles[i].if_desc.bInterfaceClass == USBCLASS_AUDIO)
 		{
 			iface_stor = &profiles[i];
 			break;
 		}
 	}
-	if (!iface_stor) OSFatal("No storage interfaces detected");
+	if (!iface_stor) OSFatal("No audio interfaces detected");
 
 	/* Administer the device */
 	int ret = UhsAdministerDevice(uhs_handle, iface_stor->if_handle, 2, 0);
