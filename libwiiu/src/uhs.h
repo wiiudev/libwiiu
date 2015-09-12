@@ -60,6 +60,9 @@ int UhsAcquireInterface(int uhs_handle, uint32_t if_handle, void *unk1, int (*ca
 /* Release a currently-held USB device interface */
 int UhsReleaseInterface(int uhs_handle, uint32_t if_handle, bool no_reacquire);
 
+/* Administer a USB device */
+int UhsAdministerDevice(int uhs_handle, uint32_t if_handle, int arg2, int arg3);
+
 /* Submit a control request to endpoint 0 */
 int UhsSubmitControlRequest(int uhs_handle, uint32_t if_handle, void *buffer, uint8_t bRequest, uint8_t bmRequestType, uint16_t wValue, uint16_t wIndex, uint16_t wLength, int timeout);
 
