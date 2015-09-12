@@ -61,7 +61,6 @@ Next, start `rpc.py` in an interactive Python session (IDLE or IPython is a good
 * Marionumber1
 * TheKit
 * Hykem
-* bubba
 * comex
 * Chadderz
 * Relys
