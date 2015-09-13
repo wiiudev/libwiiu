@@ -1,7 +1,7 @@
 #include "loader.h"
 
 /* Acquisition callback */
-int callback(int arg0, int arg1, int arg2);
+int callback(void *context, UhsInterfaceProfile *profile);
 
 /* Start of our code */
 void _start()
@@ -15,9 +15,15 @@ void _start()
 	/* Open the first USB controller */
 	int uhs_handle = UhsOpenController(0);
 
+	/* Register a class driver for all devices */
+	UhsInterfaceFilter filter = { MATCH_ANY };
+	UhsClassDrvReg(uhs_handle, &filter, (void*)uhs_handle, &callback);
+
+	while(1);
+
 	/* Get the interfaces plugged into each port */
 	UhsInterfaceProfile profiles[4];
-	UhsInterfaceFilter filter = { MATCH_ANY };
+	//UhsInterfaceFilter filter = { MATCH_ANY };
 	int num_ifs = UhsQueryInterfaces(uhs_handle, &filter, &profiles[0], 4);
 	if (num_ifs <= 0) OSFatal("No USB interfaces detected");
 
@@ -47,8 +53,8 @@ void _start()
 	while(1);
 }
 
-/* Acquisition callback */
-int callback(int arg0, int arg1, int arg2)
+/* Class driver callback */
+int callback(void *context, UhsInterfaceProfile *profile)
 {
 	OSFatal("In the callback");
 }

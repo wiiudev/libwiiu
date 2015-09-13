@@ -51,6 +51,9 @@ typedef struct
 /* Open a specific controller under /dev/uhs */
 int UhsOpenController(int controller_num);
 
+/* Register a USB class driver */
+int UhsClassDrvReg(int uhs_handle, UhsInterfaceFilter *filter, void *context, int (*cb)(void *ctx, UhsInterfaceProfile *profile));
+
 /* Determine which USB device interfaces are plugged in and available */
 int UhsQueryInterfaces(int uhs_handle, UhsInterfaceFilter *filter, UhsInterfaceProfile *profiles, int max_profiles);
 
