@@ -1,5 +1,6 @@
 #include "loader.h"
 
+void printChar(char *buf);
 /* Initial setup code stolen from Pong, makes race much more reliable */
 void _start()
 {
@@ -17,7 +18,12 @@ void _start()
 
 	unsigned int coreinit_handle;
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
-	
+
+	//OSScreen functions
+	void(*OSScreenInit)();
+	unsigned int(*OSScreenGetBufferSizeEx)(unsigned int bufferNum);
+	unsigned int(*OSScreenSetBufferEx)(unsigned int bufferNum, void * addr);
+
 	//OS Memory functions
 	void*(*memset)(void *dest, uint32_t value, uint32_t bytes);
 	void*(*memcpy)(void *dest, void *src, uint32_t length);
@@ -41,8 +47,12 @@ void _start()
 	/* Exit functions */
 	void (*__PPCExit)();
 	void (*_Exit)();
-	
+
 	/* Read the addresses of the functions */
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenInit", &OSScreenInit);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenGetBufferSizeEx", &OSScreenGetBufferSizeEx);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenSetBufferEx", &OSScreenSetBufferEx);
+
 	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
 	OSDynLoad_FindExport(coreinit_handle, 0, "memcpy", &memcpy);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
@@ -253,7 +263,30 @@ void _start()
 	status = CopyFromSaveArea(drvhax_name, 6, &result, 4);
 	if (result != KERN_CODE_READ)
 	{
-		OSFatal("Race attack failed :(");
+		//Call the Screen initilzation function.
+		OSScreenInit();
+		//Grab the buffer size for each screen (TV and gamepad)
+		int buf0_size = OSScreenGetBufferSizeEx(0);
+		int buf1_size = OSScreenGetBufferSizeEx(1);
+		//Set the buffer area.
+		OSScreenSetBufferEx(0, (void *)0xF4000000);
+		OSScreenSetBufferEx(1, (void *)0xF4000000 + buf0_size);
+		//Clear both framebuffers.
+		int ii;
+		for (ii = 0; ii < 2; ii++)
+		{
+			fillScreen(0,0,0,0);
+			flipBuffers();
+		}
+		printChar("Race attack failed! Please enter the system settings and exit\nthem before retrying.");
+		t1 = 0x3FFFFFFF;
+		while(t1--) ;
+		for(ii = 0; ii < 2; ii++)
+		{
+			fillScreen(0,0,0,0);
+			flipBuffers();
+		}
+		_Exit();
 	}
 
 	/* Search the kernel heap for DRVA and DRVHAX */
@@ -383,4 +416,14 @@ void kern_write(void *addr, uint32_t value)
 		:	"memory", "ctr", "lr", "0", "3", "4", "5", "6", "7", "8", "9", "10",
 			"11", "12"
 		);
+}
+
+void printChar(char *buf)
+{
+	int i;
+	for(i=0;i<2;i++)
+	{
+		drawString(0,0,buf);
+		flipBuffers();
+	}
 }
