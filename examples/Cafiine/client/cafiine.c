@@ -176,7 +176,7 @@ void cafiine_send_file(int sock, char *file, int size, int fd) {
     CHECK_ERROR(sock == -1);
 
     int ret;
-    
+
     // create and send buffer with : [cmd id][fd][size][buffer data ...]
     {
         char buffer[1 + 4 + 4 + size];
@@ -372,7 +372,7 @@ error:
 void cafiine_send_ping(int sock, int val1, int val2) {
     while (bss.lock) GX2WaitForVsync();
     bss.lock = 1;
-    
+
     int ret;
     char buffer[1 + 4 + 4];
     buffer[0] = BYTE_PING;
@@ -382,7 +382,7 @@ void cafiine_send_ping(int sock, int val1, int val2) {
     ret = sendwait(sock, buffer, 1 + 4 + 4);
     CHECK_ERROR(ret < 0);
 
-    error:
+error:
     bss.lock = 0;
     return;
 }

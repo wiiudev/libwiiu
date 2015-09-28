@@ -2,5 +2,5 @@
 
 void _start()
 {
-	OSFatal("Hello World!\n");
+    OSFatal("Hello World!\n");
 }

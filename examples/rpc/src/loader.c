@@ -33,7 +33,7 @@ void _start()
     OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
     OSDynLoad_Acquire("vpad.rpl", &vpad_handle);
     OSDynLoad_Acquire("nsysnet.rpl", &nsysnet_handle);
- 
+
     /****************************>       External Prototypes       <****************************/
     int (*VPADRead)(int controller, VPADData *buffer, unsigned int num, int *error);
     void (*_Exit)();
@@ -55,14 +55,14 @@ void _start()
     void* (*OSGetThreadName)(void* thread);
 
     /****************************>             Exports             <****************************/
-    
+
     OSDynLoad_FindExport(vpad_handle, 0, "VPADRead", &VPADRead);
     OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
     OSDynLoad_FindExport(coreinit_handle, 0, "OSSetExceptionCallback", &OSSetExceptionCallback);
     OSDynLoad_FindExport(coreinit_handle, 0, "DCFlushRange", &DCFlushRange);
     OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
     OSDynLoad_FindExport(coreinit_handle, 0, "OSResetEvent", &OSResetEvent);
-    
+
     OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenInit", &OSScreenInit);
     OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenGetBufferSizeEx", &OSScreenGetBufferSizeEx);
     OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenSetBufferEx", &OSScreenSetBufferEx);
@@ -79,11 +79,11 @@ void _start()
     OSSetExceptionCallback(2, &ex_cb);
     OSSetExceptionCallback(3, &ex_cb);
     OSSetExceptionCallback(6, &ex_cb);
-    
+
     /****************************>         Clear screen            <****************************/
     int screen_buf0_size;
     int screen_buf1_size;
-    
+
     // Init screen
     OSScreenInit();
 
@@ -122,7 +122,7 @@ void _start()
     PRINT_SCREEN(msg);
 
     /****************************>              Test               <****************************/
-    
+
     /****************************>            Main Loop            <****************************/
     int error;
     int button_pressed = 0;
@@ -152,8 +152,8 @@ void _start()
             thread_quit = false;
             if (nb_threads_cur > nb_threads_orig)
                 PRINT_SCREEN("Thread running")
-            else
-                thread_quit = true;
+                else
+                    thread_quit = true;
 
             __os_snprintf(msg, 512, "nb threads : %d\0", nb_threads_cur);
             PRINT_SCREEN(msg);
@@ -161,7 +161,7 @@ void _start()
 
         if(vpad_data.btn_hold & BUTTON_Y && !button_pressed)
         {
-            int* test = *_Exit;
+            int* test = (int*)_Exit;
             __os_snprintf(msg, 512, "_Exit:0x%08x\0", (int)_Exit);
             PRINT_SCREEN(msg);
             int i;
@@ -171,7 +171,7 @@ void _start()
                 PRINT_SCREEN(msg);
             }
         }
-        
+
         if(vpad_data.btn_hold & BUTTON_X && !button_pressed)
         {
 
@@ -212,12 +212,12 @@ static bool CreateThread()
     /****************************>           Get Handles           <****************************/
     unsigned int coreinit_handle;
     OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
- 
+
     /****************************>       External Prototypes       <****************************/
     void* (*OSAllocFromSystem)(uint32_t size, int align);
     bool (*OSCreateThread)(void *thread, void *entry, int argc, void *args, uint32_t stack, uint32_t stack_size, int32_t priority, uint16_t attr);
     int32_t (*OSResumeThread)(void *thread);
-    
+
     /****************************>             Exports             <****************************/
     OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
     OSDynLoad_FindExport(coreinit_handle, 0, "OSCreateThread", &OSCreateThread);
@@ -226,7 +226,7 @@ static bool CreateThread()
     /* Allocate a stack for the thread */
     uint32_t stack = (uint32_t) OSAllocFromSystem(0x1000, 0x10);
     stack += 0x1000;
-    
+
     /* Create the thread */
     void *thread = OSAllocFromSystem(OSTHREAD_SIZE, 8);
     bool ret = OSCreateThread(thread, Thread_Socket, 0, null, stack, 0x1000, 0, OS_THREAD_ATTR_AFFINITY_CORE1 | OS_THREAD_ATTR_DETACH);
@@ -266,7 +266,7 @@ static int Thread_Socket(int intArg, void *ptrArg)
     int i, j, k;
     for (i = 0; i < 8; i++)
         sin.sin_zero[i] = 0;
-    
+
     int rpc = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (rpc < 0)
         return 1;
@@ -285,7 +285,8 @@ static int Thread_Socket(int intArg, void *ptrArg)
         switch (buffer[0])
         {
         /* Read memory */
-        case 0: ;
+        case 0:
+            ;
             /* Copy them into the buffer */
             unsigned int *src = (unsigned int*) buffer[1];
             unsigned int *dest = &buffer[1];
@@ -293,7 +294,7 @@ static int Thread_Socket(int intArg, void *ptrArg)
 
             for (i = 0; i < num_words; i++)
             {
-              dest[i] = src[i];
+                dest[i] = src[i];
             }
 
             /* Send the buffer back */
@@ -302,7 +303,8 @@ static int Thread_Socket(int intArg, void *ptrArg)
             break;
 
         /* Write memory */
-        case 1: ;
+        case 1:
+            ;
             /* Copy them into the buffer */
             src = &buffer[3];
             dest = (unsigned int*) buffer[1];
@@ -310,13 +312,14 @@ static int Thread_Socket(int intArg, void *ptrArg)
 
             for (i = 0; i < num_words; i++)
             {
-              dest[i] = src[i];
+                dest[i] = src[i];
             }
 
             break;
-            
+
         /* Get symbol */
-        case 2: ;
+        case 2:
+            ;
             /* Identify the RPL name and symbol name */
             char *rplname = (char*) &buffer[3];
             char *symname = (char*) ((unsigned char*)&buffer[0]) + buffer[2];
@@ -325,15 +328,16 @@ static int Thread_Socket(int intArg, void *ptrArg)
             unsigned int module_handle, function_address;
             OSDynLoad_Acquire(rplname, &module_handle);
             OSDynLoad_FindExport(module_handle, 0, symname, &function_address);
-                buffer[1] = function_address;
+            buffer[1] = function_address;
 
             /* Send the buffer back */
             send(rpc, buffer, 512, 0);
 
             break;
-            
+
         /* Call function */
-        case 3: ;
+        case 3:
+            ;
             /* Create a function pointer */
             unsigned int (*function)(unsigned int r3, unsigned int r4, unsigned int r5, unsigned int r6, unsigned int r7);
             function = (void*)buffer[1];

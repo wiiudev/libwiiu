@@ -122,7 +122,7 @@ DECL(int, FSSetPosFile, void *pClient, void *pCmd, int fd, int pos, int error) {
         if (client < MAX_CLIENT && client >= 0) {
             int ret;
             if (cafiine_fsetpos(bss.socket_fsa[client], &ret, fd, pos) == 0) {
-                    return ret;
+                return ret;
             }
         }
     }
