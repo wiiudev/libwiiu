@@ -84,6 +84,19 @@ void _start()
     //wait a bit for browser end
     unsigned int t1 = 0x1FFFFFFF;
     while(t1--) ;
+    
+    asm ( "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  "nop\n"
+		  );
 
     /* Skip the whole exploit if 0xa0000000 is already mapped */
     if (OSEffectiveToPhysical((void*)0xa0000000) != 0)
