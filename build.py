@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #Used for fs and platform identification
 import os,sys,platform
 #Used to call external python process
