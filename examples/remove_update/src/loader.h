@@ -4,6 +4,4 @@
 #include "../../../libwiiu/src/coreinit.h"
 
 void _start();
-
-void _entryPoint();
 #endif /* LOADER_H */

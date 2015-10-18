@@ -7,8 +7,8 @@
 #include "../../../libwiiu/src/draw.h"
 
 /* Wait times for CPU0 and CPU2 */
-#define CPU0_WAIT_TIME		80
-#define CPU2_WAIT_TIME		92
+#define CPU0_WAIT_TIME		20
+#define CPU2_WAIT_TIME		96
 
 /* Gadget finding addresses */
 #define JIT_ADDRESS			        0x01800000

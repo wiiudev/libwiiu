@@ -1,142 +1,142 @@
 #include "loader.h"
 void _start()
 {
-	/* Get a handle to coreinit.rpl */
-	unsigned int coreinit_handle;
-	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
-	//OS memory functions
-	void* (*memcpy)(void *dest, void *src, uint32_t length);
-	void* (*memset)(void * dest, uint32_t value, uint32_t bytes);
-	void* (*OSAllocFromSystem)(uint32_t size, int align);
-	void (*OSFreeToSystem)(void *ptr);
-	OSDynLoad_FindExport(coreinit_handle, 0, "memcpy", &memcpy);
-	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSFreeToSystem", &OSFreeToSystem);
-	
-	void (*OSCoherencyBarrier)();
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSCoherencyBarrier", &OSCoherencyBarrier);
-	
-	void (*_Exit)();
-	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
-	
-	//DC memory functions
-	void (*DCFlushRangeNoSync)(void *buffer, uint32_t length);
-	void (*DCInvalidateRange)(void *buffer, uint32_t length);
-  	OSDynLoad_FindExport(coreinit_handle, 0, "DCFlushRangeNoSync", &DCFlushRangeNoSync);
-	OSDynLoad_FindExport(coreinit_handle, 0, "DCInvalidateRange", &DCInvalidateRange);
-	
-	//LC memory functions
-	void* (*LCAlloc)( uint32_t bytes );
-	void (*LCDealloc)();
-	uint32_t (*LCHardwareIsAvailable)();
-	uint32_t (*LCIsDMAEnabled)();
-	void (*LCEnableDMA)();
-	void (*LCDisableDMA)();
-	void (*LCLoadDMABlocks)(void* lc_addr, void* src_addr, uint32_t blocks);
-	void (*LCStoreDMABlocks)(void* dest_addr, void* lc_addr, uint32_t blocks);
-	void (*LCWaitDMAQueue)( uint32_t length );
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCAlloc", &LCAlloc);
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCDealloc", &LCDealloc);
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCHardwareIsAvailable", &LCHardwareIsAvailable);
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCIsDMAEnabled", &LCIsDMAEnabled);
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCEnableDMA", &LCEnableDMA);
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCDisableDMA", &LCDisableDMA);
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCLoadDMABlocks", &LCLoadDMABlocks);
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCStoreDMABlocks", &LCStoreDMABlocks);
-	OSDynLoad_FindExport(coreinit_handle, 0, "LCWaitDMAQueue", &LCWaitDMAQueue);
-		
-	//Used for keeping track of vairables to print to screen
-	char output[1000];
-	
-	//Alloc 64 byte alligned space
-	void* src_addr=OSAllocFromSystem(512,64);
-	void* dest_addr=OSAllocFromSystem(512,64);
-	
-	//Store some debug values
-	__os_snprintf(output, 1000, "src_addr:%02x,",(uint32_t)src_addr);
-	__os_snprintf(output+strlen(output), 255, "dest_addr: %02x,", (uint32_t)dest_addr);
-	
-	//Number of 32bit blocks to copy. Must be multiple of 2 between [0,127]
-	uint32_t blocks=2; //2 32bit blocks
-	
-	//Do something to the source
-	memset(src_addr,1,64);
-	
-	//Grab values for debug
-	uint32_t * src_val=src_addr;
-	uint32_t * dest_val=dest_addr;
-	__os_snprintf(output+strlen(output), 255, "Old src_val: %02x\n",src_val[0]);
-	__os_snprintf(output+strlen(output), 255, "Old dest_val: %02x,",dest_val[0]);
-	
-	//Get some locked cache address space
-	void *lc_addr=LCAlloc(512); //512 Minmum. Must be multiple of 512.
-	__os_snprintf(output+strlen(output), 255, "LC buf: %08X",lc_addr);
-	
-	//Calculate size from blocks to flush/invalidate range properly
-	uint32_t size;
-	//If blocks is set to 0, the transaction will default to 128 blocks
-	if(blocks==0)
-	{
-		size=32*128;
-	}
-	else
-	{
-		size=32*blocks;
-	}
-	//Flush the range at the source to ensure cache gets written back to memory.
-	DCFlushRangeNoSync(src_addr,size);
-	//Invalidate the range at the destination
-	DCInvalidateRange(dest_addr,size);
-	//Sync
-	OSCoherencyBarrier();
-	
-	//Check to see of DMA hardware is avaliable
-	if(LCHardwareIsAvailable()!=1)
-	{
-		OSFatal("Hardware is not avaliable.");
-	}
+    /* Get a handle to coreinit.rpl */
+    unsigned int coreinit_handle;
+    OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
+    //OS memory functions
+    void* (*memcpy)(void *dest, void *src, uint32_t length);
+    void* (*memset)(void * dest, uint32_t value, uint32_t bytes);
+    void* (*OSAllocFromSystem)(uint32_t size, int align);
+    void (*OSFreeToSystem)(void *ptr);
+    OSDynLoad_FindExport(coreinit_handle, 0, "memcpy", &memcpy);
+    OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
+    OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
+    OSDynLoad_FindExport(coreinit_handle, 0, "OSFreeToSystem", &OSFreeToSystem);
 
-	//Gets the current state of DMA, so we can restore it after our copy
-	uint32_t dmaState=LCIsDMAEnabled();
+    void (*OSCoherencyBarrier)();
+    OSDynLoad_FindExport(coreinit_handle, 0, "OSCoherencyBarrier", &OSCoherencyBarrier);
 
-	//Checks to see if DMA is enabled, if not it will try to enable it.
-	if(dmaState!=1)
-	{
-		LCEnableDMA();
-		dmaState=LCIsDMAEnabled();
-		if(dmaState!=1)
-		{
-			OSFatal("Can't enable DMA");
-		}
-	}
-	
-	//Load memory to locked cache
-	LCLoadDMABlocks(lc_addr,src_addr,blocks);
-	LCWaitDMAQueue(0);
-	
-	//Store memory from locked cache
-	LCStoreDMABlocks(dest_addr,lc_addr,blocks);
-	LCWaitDMAQueue(0);
+    void (*_Exit)();
+    OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
 
-	//If DMA was not previously enabled, then disable it to restore state.
-	if(dmaState!=1)
-	{
-		LCDisableDMA();
-		dmaState=LCIsDMAEnabled();
-		//If DMA failed to disable, return error code
-		if(dmaState!=1)
-		{
-			OSFatal("Couldn't Disable DMA");
-		}
-	}
-	__os_snprintf(output+strlen(output), 255, "New src_val: %02x,",src_val[0]);
-	__os_snprintf(output+strlen(output), 255, "New dest_val: %02x,",dest_val[0]);
-	
-	//Cleanup
-	LCDealloc(lc_addr);
-	OSFreeToSystem(dest_addr);
-	OSFreeToSystem(src_addr);
+    //DC memory functions
+    void (*DCFlushRangeNoSync)(void *buffer, uint32_t length);
+    void (*DCInvalidateRange)(void *buffer, uint32_t length);
+    OSDynLoad_FindExport(coreinit_handle, 0, "DCFlushRangeNoSync", &DCFlushRangeNoSync);
+    OSDynLoad_FindExport(coreinit_handle, 0, "DCInvalidateRange", &DCInvalidateRange);
+
+    //LC memory functions
+    void* (*LCAlloc)( uint32_t bytes );
+    void (*LCDealloc)();
+    uint32_t (*LCHardwareIsAvailable)();
+    uint32_t (*LCIsDMAEnabled)();
+    void (*LCEnableDMA)();
+    void (*LCDisableDMA)();
+    void (*LCLoadDMABlocks)(void* lc_addr, void* src_addr, uint32_t blocks);
+    void (*LCStoreDMABlocks)(void* dest_addr, void* lc_addr, uint32_t blocks);
+    void (*LCWaitDMAQueue)( uint32_t length );
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCAlloc", &LCAlloc);
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCDealloc", &LCDealloc);
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCHardwareIsAvailable", &LCHardwareIsAvailable);
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCIsDMAEnabled", &LCIsDMAEnabled);
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCEnableDMA", &LCEnableDMA);
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCDisableDMA", &LCDisableDMA);
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCLoadDMABlocks", &LCLoadDMABlocks);
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCStoreDMABlocks", &LCStoreDMABlocks);
+    OSDynLoad_FindExport(coreinit_handle, 0, "LCWaitDMAQueue", &LCWaitDMAQueue);
+
+    //Used for keeping track of vairables to print to screen
+    char output[1000];
+
+    //Alloc 64 byte alligned space
+    void* src_addr=OSAllocFromSystem(512,64);
+    void* dest_addr=OSAllocFromSystem(512,64);
+
+    //Store some debug values
+    __os_snprintf(output, 1000, "src_addr:%02x,",(uint32_t)src_addr);
+    __os_snprintf(output+strlen(output), 255, "dest_addr: %02x,", (uint32_t)dest_addr);
+
+    //Number of 32bit blocks to copy. Must be multiple of 2 between [0,127]
+    uint32_t blocks=2; //2 32bit blocks
+
+    //Do something to the source
+    memset(src_addr,1,64);
+
+    //Grab values for debug
+    uint32_t * src_val=src_addr;
+    uint32_t * dest_val=dest_addr;
+    __os_snprintf(output+strlen(output), 255, "Old src_val: %02x\n",src_val[0]);
+    __os_snprintf(output+strlen(output), 255, "Old dest_val: %02x,",dest_val[0]);
+
+    //Get some locked cache address space
+    void *lc_addr=LCAlloc(512); //512 Minmum. Must be multiple of 512.
+    __os_snprintf(output+strlen(output), 255, "LC buf: %08X",lc_addr);
+
+    //Calculate size from blocks to flush/invalidate range properly
+    uint32_t size;
+    //If blocks is set to 0, the transaction will default to 128 blocks
+    if(blocks==0)
+    {
+        size=32*128;
+    }
+    else
+    {
+        size=32*blocks;
+    }
+    //Flush the range at the source to ensure cache gets written back to memory.
+    DCFlushRangeNoSync(src_addr,size);
+    //Invalidate the range at the destination
+    DCInvalidateRange(dest_addr,size);
+    //Sync
+    OSCoherencyBarrier();
+
+    //Check to see of DMA hardware is avaliable
+    if(LCHardwareIsAvailable()!=1)
+    {
+        OSFatal("Hardware is not avaliable.");
+    }
+
+    //Gets the current state of DMA, so we can restore it after our copy
+    uint32_t dmaState=LCIsDMAEnabled();
+
+    //Checks to see if DMA is enabled, if not it will try to enable it.
+    if(dmaState!=1)
+    {
+        LCEnableDMA();
+        dmaState=LCIsDMAEnabled();
+        if(dmaState!=1)
+        {
+            OSFatal("Can't enable DMA");
+        }
+    }
+
+    //Load memory to locked cache
+    LCLoadDMABlocks(lc_addr,src_addr,blocks);
+    LCWaitDMAQueue(0);
+
+    //Store memory from locked cache
+    LCStoreDMABlocks(dest_addr,lc_addr,blocks);
+    LCWaitDMAQueue(0);
+
+    //If DMA was not previously enabled, then disable it to restore state.
+    if(dmaState!=1)
+    {
+        LCDisableDMA();
+        dmaState=LCIsDMAEnabled();
+        //If DMA failed to disable, return error code
+        if(dmaState!=1)
+        {
+            OSFatal("Couldn't Disable DMA");
+        }
+    }
+    __os_snprintf(output+strlen(output), 255, "New src_val: %02x,",src_val[0]);
+    __os_snprintf(output+strlen(output), 255, "New dest_val: %02x,",dest_val[0]);
+
+    //Cleanup
+    LCDealloc(lc_addr);
+    OSFreeToSystem(dest_addr);
+    OSFreeToSystem(src_addr);
     OSFatal(output);
 }
 /*
@@ -180,24 +180,24 @@ coreinit.rpl LCLoadDMABlocks
 Original Instructions           Step 1 (google it)      Conversion
 ----------------------------------------------------------------------------
 clrlslwi r0,r5,30,2     =>      rlwinm r0,r5,2,28,29    =>r0=(r5 << 2) & 0xC
- 
+
 ori r11,r3,0x10                                         =>r11=r3|0x10
- 
+
 extrwi r12,r5,5,25      =>      rlwinm r12,r5,30,27,31  =>r12=(r5<<30) & 0x1F
- 
+
 or r10,r11,r0                                           =>r10=r11|r0
- 
+
 or r3,r4,r12                                            =>r3=r4|r12
- 
+
 ori r4, r10, 2                                          =>r4=r10|2
- 
+
 li, r0, 0xE                                             =>syscall_0xE(r3,r4)
 sc
 ----------------------------------------------------------------------------
 Use substitution
 ----------------------------------------------------------------------------
 r3=r4|((r5<<30) & 0x1F)
- 
+
 r4=((r3|0x10)|((r5 << 2) & 0xC))|2
 ----------------------------------------------------------------------------
 C code

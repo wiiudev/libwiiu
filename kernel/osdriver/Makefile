@@ -1,3 +1,4 @@
+export PATH	:=	$(DEVKITPPC)/bin:$(PATH)
 CC=powerpc-eabi-gcc
 CFLAGS=-std=gnu99 -nostdinc -fno-builtin -c
 LD=powerpc-eabi-ld

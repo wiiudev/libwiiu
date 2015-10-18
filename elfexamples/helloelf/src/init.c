@@ -7,24 +7,24 @@ unsigned int coreinit_handle = 0;
 
 void _doInit()
 {
-	OSDynLoad_Acquire = (void*)(*(unsigned int*)0xF5FFFFFC);
-	OSDynLoad_FindExport = (void*)(*(unsigned int*)0xF5FFFFF8);
-	OSFatal = (void*)(*(unsigned int*)0xF5FFFFF4);
-	__os_snprintf = (void*)(*(unsigned int*)0xF5FFFFF0);
-	coreinit_handle = *(unsigned int*)0xF5FFFFEC;
+    OSDynLoad_Acquire = (void*)(*(unsigned int*)0xF5FFFFFC);
+    OSDynLoad_FindExport = (void*)(*(unsigned int*)0xF5FFFFF8);
+    OSFatal = (void*)(*(unsigned int*)0xF5FFFFF4);
+    __os_snprintf = (void*)(*(unsigned int*)0xF5FFFFF0);
+    coreinit_handle = *(unsigned int*)0xF5FFFFEC;
 }
 
 void _doExit()
 {
-	void(*_Exit)();
-	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
-	_Exit();
+    void(*_Exit)();
+    OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
+    _Exit();
 }
 
 void _memset(void *b, int c, int len)
 {
-	int i;
+    int i;
 
-	for (i = 0; i < len; i++)
-		((unsigned char *)b)[i] = c;
+    for (i = 0; i < len; i++)
+        ((unsigned char *)b)[i] = c;
 }
