@@ -62,6 +62,24 @@ MAC OSX:
 
 For now,I don't know how to do in MAC,feel free to add this part.
 
+#### Hosting ####
+
+On Windows:
+
+Bullywiiplaza do a good video [here](https://www.youtube.com/watch?feature=player_embedded&v=b-ztG3JmyE8).
+
+On Linux/Mac OS X:
+
+You can creat a little server using these commands:
+
+`cd path/to/homebrew/`
+
+`python -mSimpleHTTPServer 2343`
+
+Put on your Wii U browser: http://yourinternalip:2343/
+
+To find your IP,do the command: `ifconfig` and check the `wlan0/inet adr:` connection.
+
 #### Adding to path ####
 
 **Thank Pounou,from [gbatemp.net](https://gbatemp.net/members/pounou.353622/), for the little tutorial**
