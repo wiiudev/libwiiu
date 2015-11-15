@@ -27,7 +27,7 @@ This repository contains a C build system, which allows you to compile your own 
 
 On Windows:
 
-1.Install all thing you view on C build system.
+1.Install all thing you view on `C build system`.
 
 2.Add to path (check `Adding to path`)
 
@@ -54,9 +54,9 @@ export DEVKITARM=/opt/devkitpro/devkitARM
 export DEVKITPPC=/opt/devkitpro/devkitPPC
 export PATH=$PATH:/opt/devkitpro/devkitPPC/bin
 
-6.Download Libwiiu.
+5.Download Libwiiu.
 
-5.Compile using : `python build.py your/apps/you/want/to/compile` (check `Build example`).
+6.Compile using : `python build.py your/apps/you/want/to/compile` (check `Build example`).
 
 MAC OSX:
 
