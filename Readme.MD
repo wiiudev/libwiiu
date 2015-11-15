@@ -6,7 +6,7 @@ Right now, almost all firmware versions are compatible:
 * Firmware versions 2.0.0 (first instalment of the Internet Browser) to 5.1.0 are supported by exploiting an use-after-free bug (CVE-2013-2842).
 * Firmware version 5.3.2 is supported by exploiting a memory corruption bug (CVE-2014-1300).
 * Firmware versions 5.1.1 to 5.3.1 are also supported, but currently unimplemented.
-* Firmware version 5.4.0 is supported but not released.
+* Firmware version 5.4.0 is supported but not released,it's have to be patched for release.
 * Firmware version 5.5.0 is using the same exploit than 5.4.0.
 
 ### What's inside? ###
