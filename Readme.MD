@@ -47,11 +47,14 @@ On Linux:
 
 3.Open terminal in your home directory,and do `nano .bashrc` (if you want a graphical interface, you can do this: `name_of_the_GUI_text_editor .bashrc`)
 
-4.Copy past this at the end of it:
+4.Copy past this at the end of it (copy past it without the space I do between line):
 
 export DEVKITPRO=/opt/devkitpro
+
 export DEVKITARM=/opt/devkitpro/devkitARM
+
 export DEVKITPPC=/opt/devkitpro/devkitPPC
+
 export PATH=$PATH:/opt/devkitpro/devkitPPC/bin
 
 5.Download Libwiiu.
