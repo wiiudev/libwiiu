@@ -71,10 +71,15 @@ This is for Windows user.
 To access the `PATH`:
 
 1.Go to start menu of Windows
+
 2.Search `environment`
+
 3.Clic on `Modify system environment variables`
+
 4.Clic on `environment variables`
+
 5.In `System variable`,find one who named `Path`
+
 6.Clic on it,clic `modify`,and copy all these things in the value (do not touch the text, just copy/past):
 
 ;C:\devkitPro\msys\bin;C:\Python27\;C:\Python27\Scripts\
