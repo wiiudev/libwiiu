@@ -50,11 +50,8 @@ On Linux:
 4.Copy past this at the end of it:
 
 export DEVKITPRO=/opt/devkitpro
-
 export DEVKITARM=/opt/devkitpro/devkitARM
-
 export DEVKITPPC=/opt/devkitpro/devkitPPC
-
 export PATH=$PATH:/opt/devkitpro/devkitPPC/bin
 
 5.Download Libwiiu.
