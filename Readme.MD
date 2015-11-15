@@ -1,12 +1,13 @@
 # README #
 
-This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only.
+This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** provide any access to the Starbuck,but now,its allow running code in Espresso kernel-mode. We hope to implement this in the future, but the exploit is currently limited to kernel only.
 
 Right now, almost all firmware versions are compatible:
 * Firmware versions 2.0.0 (first instalment of the Internet Browser) to 5.1.0 are supported by exploiting an use-after-free bug (CVE-2013-2842).
 * Firmware version 5.3.2 is supported by exploiting a memory corruption bug (CVE-2014-1300).
 * Firmware versions 5.1.1 to 5.3.1 are also supported, but currently unimplemented.
-* Firmware version 5.4.0 is not supported yet.
+* Firmware version 5.4.0 is supported but not released.
+* Firmware version 5.5.0 is using the same exploit than 5.4.0.
 
 ### What's inside? ###
 
@@ -22,8 +23,64 @@ This repository contains a C build system, which allows you to compile your own 
 * [devkitPPC](http://sourceforge.net/projects/devkitpro/) (needed to compile and link the C code), with `C:\devkitPro\devkitPPC\bin` added to `PATH`
 * [Python](https://www.python.org/downloads/) 3.x (must add `C:\Python34` to `PATH`) or 2.x
 
+#### Building ####
+
+On Windows:
+
+1.Install all thing you view on C build system.
+
+2.Add to path (check `Adding to path`)
+
+3.Download Libwiiu.
+
+4.Go to libwiiu folder with: `cd c:\path\to\libwiiu`.
+
+5.Compile using : `python build.py your/apps/you/want/to/compile` (check `Build example`).
+
+You will find all in www folder.
+
+On Linux:
+
+1.You dont have to install python/cygwin,python is pre-installed.
+
+2.Install devkitpro by runnig [this script](http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitPPCupdate.pl/download) with the following command `sudo perl devkitPPCupdate.pl /opt/devkitpro ` (be sure that you are in the same folder than the file)
+
+3.Open terminal in your home directory,and do `nano .bashrc` (if you want a graphical interface, you can do this: `name_of_the_GUI_text_editor .bashrc`)
+
+4.Copy past this at the end of it:
+
+export DEVKITPRO=/opt/devkitpro
+export DEVKITARM=/opt/devkitpro/devkitARM
+export DEVKITPPC=/opt/devkitpro/devkitPPC
+export PATH=$PATH:/opt/devkitpro/devkitPPC/bin
+
+6.Download Libwiiu.
+
+5.Compile using : `python build.py your/apps/you/want/to/compile` (check `Build example`).
+
+MAC OSX:
+
+For now,I don't know how to do in MAC,feel free to add this part.
+
+#### Adding to path ####
+
+**Thank Pounou,from [gbatemp.net](https://gbatemp.net/members/pounou.353622/), for the little tutorial**
+
+This is for Windows user.
+
+To access the `PATH`:
+
+1.Go to start menu of Windows
+2.Search `environment`
+3.Clic on `Modify system environment variables`
+4.Clic on `environment variables`
+5.In `System variable`,find one who named `Path`
+6.Clic on it,clic `modify`,and copy all these things in the value (do not touch the text, just copy/past):
+
+;C:\devkitPro\msys\bin;C:\Python27\;C:\Python27\Scripts\
+
 #### Build Example ####
-The `osscreenexamples` folder contains projects using `OSScreen` and the `loader.c` from `libwiiu`. The `examples` folder does not use `OSScreen` and uses the `loader.c` in the `projects` local directory.
+The `osscreenexamples` folder contains projects using `OSScreen` and the `loader.c` from `libwiiu`. The `examples` folder does not use `OSScreen` and uses the `loader.c` in the `projects` local directory.The `kernel` folder contain code who permit access to Espresso kernel-mod (not starbuck).
 * `python build.py <project path>`
 * `python build.py osscreenexamples/template`
 
