@@ -35,7 +35,7 @@ On Windows:
 
 4.Go to libwiiu folder with: `cd c:\path\to\libwiiu`.
 
-5.Compile using : `python build.py your/apps/you/want/to/compile` (check `Build example`).
+5.Compile using (on a cygwin shell)  : `python build.py your/apps/you/want/to/compile` (check `Build example`).
 
 You will find all in www folder.
 
