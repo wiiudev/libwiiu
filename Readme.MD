@@ -99,7 +99,7 @@ To access the `PATH`:
 
 4.Clic on `environment variables`
 
-5.In `System variable`,find one who named `Path`
+5.In `System variable`,find one who named `Path` (or creat new one)
 
 6.Clic on it,clic `modify`,and copy all these things in the value (do not touch the text, just copy/past):
 
