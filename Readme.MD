@@ -51,11 +51,9 @@ On Linux:
 
 export DEVKITPRO=/opt/devkitpro
 
-export DEVKITARM=/opt/devkitpro/devkitARM
+export DEVKITPPC=$DEVKITPRO/devkitPPC
 
-export DEVKITPPC=/opt/devkitpro/devkitPPC
-
-export PATH=$PATH:/opt/devkitpro/devkitPPC/bin
+export PATH=$PATH:$DEVKITPRO/devkitPPC/bin
 
 5. Download Libwiiu.
 
@@ -63,7 +61,13 @@ export PATH=$PATH:/opt/devkitpro/devkitPPC/bin
 
 MAC OSX:
 
-By now, I don't know how to do on MAC. Feel free to complete this part.
+Same than linux,but you have to paste this in a terminal each time you want to compile:
+
+export DEVKITPRO=/opt/devkitpro
+
+export DEVKITPPC=$DEVKITPRO/devkitPPC
+
+export PATH=$PATH:$DEVKITPRO/devkitPPC/bin
 
 #### Hosting ####
 
