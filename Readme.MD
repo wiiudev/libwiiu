@@ -1,12 +1,13 @@
 # README #
 
-This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only.
+This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** provide any access to the Starbuck, but now allows running code in Espresso kernel-mode. We hope to implement this in the future, but the exploit is currently limited to kernel only.
 
 Right now, almost all firmware versions are compatible:
 * Firmware versions 2.0.0 (first instalment of the Internet Browser) to 5.1.0 are supported by exploiting an use-after-free bug (CVE-2013-2842).
 * Firmware version 5.3.2 is supported by exploiting a memory corruption bug (CVE-2014-1300).
 * Firmware versions 5.1.1 to 5.3.1 are also supported, but currently unimplemented.
-* Firmware version 5.4.0 is not supported yet.
+* Firmware version 5.4.0 is supported by exploiting a libstagefright bug (same than [this New 3DS exploit](https://github.com/yellows8/browserhax_fright)), but not released yet. It have to be patched before release.
+* Firmware version 5.5.0 is supported by using the same exploit than 5.4.0.
 
 ### What's inside? ###
 
@@ -22,8 +23,94 @@ This repository contains a C build system, which allows you to compile your own 
 * [devkitPPC](http://sourceforge.net/projects/devkitpro/) (needed to compile and link the C code), with `C:\devkitPro\devkitPPC\bin` added to `PATH`
 * [Python](https://www.python.org/downloads/) 3.x (must add `C:\Python34` to `PATH`) or 2.x
 
+#### Building ####
+
+On Windows:
+
+1. Install all thing you view on `C build system`.
+
+2. Add to path (check `Adding to path`)
+
+3. Download Libwiiu.
+
+4. Go to libwiiu folder with: `cd c:\path\to\libwiiu`.
+
+5. Compile using (from a Cygwin terminal)  : `python build.py your/apps/you/want/to/compile` (check `Build example`).
+
+You will find all in www folder.
+
+On Linux:
+
+1. You don't have to install python/cygwin, python is pre-installed.
+
+2. Install devkitpro by running [this script](http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitPPCupdate.pl/download) with the following command `sudo perl devkitPPCupdate.pl /opt/devkitpro ` (be sure that you are in the same folder than the file)
+
+3. Open a terminal in your home directory, then do `nano .bashrc` (if you want a graphical interface, you can do this: `name_of_the_GUI_text_editor .bashrc`)
+
+4. Copy and past each following lines at the end of the file (without any blank lines between):
+
+export DEVKITPRO=/opt/devkitpro
+
+export DEVKITPPC=$DEVKITPRO/devkitPPC
+
+export PATH=$PATH:$DEVKITPRO/devkitPPC/bin
+
+5. Download Libwiiu.
+
+6. Compile using : `python build.py your/apps/you/want/to/compile` (check `Build example`).
+
+MAC OSX:
+
+Same than linux,but you have to paste this in a terminal each time you want to compile:
+
+export DEVKITPRO=/opt/devkitpro
+
+export DEVKITPPC=$DEVKITPRO/devkitPPC
+
+export PATH=$PATH:$DEVKITPRO/devkitPPC/bin
+
+#### Hosting ####
+
+On Windows:
+
+Follow the great Bullywiiplaza's video [here](https://www.youtube.com/watch?feature=player_embedded&v=b-ztG3JmyE8).
+
+On Linux/Mac OS X:
+
+You can create a simple server using these commands:
+
+`cd path/to/homebrew/`
+
+`python -mSimpleHTTPServer 2343`
+
+Put on your Wii U browser: http://yourinternalip:2343/
+
+To find your IP address, do the command: `ifconfig` and look at the `wlan0/inet adr:` connection.
+
+#### Adding to path ####
+
+**Thank Pounou, from [gbatemp.net](https://gbatemp.net/members/pounou.353622/), for this quick tutorial**
+
+This is for Windows user.
+
+To edit the `PATH` environment variable:
+
+1. Go to start menu of Windows
+
+2. Search `environment`
+
+3. Clic on `Modify system environment variables`
+
+4. Clic on `environment variables`
+
+5. In `System variable`,find one who named `Path` (or creat new one)
+
+6. Clic on it, clic `modify`, then add the following line at the end of the existing value (do not touch the text, simply copy/past):
+
+;C:\devkitPro\msys\bin;C:\Python27\;C:\Python27\Scripts\
+
 #### Build Example ####
-The `osscreenexamples` folder contains projects using `OSScreen` and the `loader.c` from `libwiiu`. The `examples` folder does not use `OSScreen` and uses the `loader.c` in the `projects` local directory.
+The `osscreenexamples` folder contains projects using `OSScreen` and the `loader.c` from `libwiiu`. The `examples` folder does not use `OSScreen` and uses the `loader.c` in the `projects` local directory. The `kernel` folder contains code that allows access to Espresso kernel-mod (not starbuck).
 * `python build.py <project path>`
 * `python build.py osscreenexamples/template`
 
@@ -66,3 +153,4 @@ Next, start `rpc.py` in an interactive Python session (IDLE or IPython is a good
 * Relys
 * NWPlayer123
 * Mathew_Wi
+
