@@ -72,7 +72,8 @@ void _start()
 /* curl macros */
 #define CURLOPT_URL				10002
 #define CURLOPT_WRITEFUNCTION	20011
-#define CURLOPT_WRITEDATA		0x0
+#define CURLOPT_WRITEDATA		10001	/* Maybe? */
+#define CURLOPT_USERAGENT		10018	/* Maybe? */
 #define CURLINFO_RESPONSE_CODE	0x200002
 
 /* curl download callback */
