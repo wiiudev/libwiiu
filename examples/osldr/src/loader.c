@@ -1,6 +1,6 @@
 #include "loader.h"
 
-/* Trap CPU0 and CPU2 at the ICI handler, and get the new kernel loaded */
+/* Trap CPU0 and CPU2 at the ICI handler, and start the stub loader */
 void _start()
 {
     /* Get a handle to coreinit.rpl */
@@ -17,11 +17,11 @@ void _start()
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSEffectiveToPhysical", &OSEffectiveToPhysical);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSAllocFromSystem", &OSAllocFromSystem);
 
-	/* OS thread functions */
+	/* OS thread functions 
 	bool (*OSCreateThread)(void *thread, void *entry, int argc, void *args, uint32_t *stack, uint32_t stack_size, int priority, uint16_t attr);
 	int (*OSResumeThread)(void *thread);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSCreateThread", &OSCreateThread);
-	OSDynLoad_FindExport(coreinit_handle, 0, "OSResumeThread", &OSResumeThread);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSResumeThread", &OSResumeThread);*/
 
 	/* ICI functions */
 	void (*__KernelSendICI)(int unk1, int cpunum, int code, int unk2);
@@ -59,19 +59,22 @@ void _start()
 	__KernelSendICI(3, 0, 0x050000, 0);
 	__KernelSendICI(3, 2, 0x050000, 0);
 
-	/* Create and start the stub loader */
-	OSContext *thread1 = (OSContext*)OSAllocFromSystem(0x1000,8);
-	uint32_t *stack1 = (uint32_t*)OSAllocFromSystem(0x1000,0x20);
-	if (!OSCreateThread(thread1, &start_stubldr, 0, NULL, stack1 + 0x400, 0x1000, 0, 0x2 | 0x8)) OSFatal("Failed to create thread");
-	OSResumeThread(thread1);
+	/* Copy the stub loader into kernel memory */
+	uint32_t stubldr_code[] = 
+	{
+	};
+	uint32_t stubldr_kaddr = 0xFFF00000;
+	memcpy((void*)(0xA0000000 + (stubldr_kaddr - 0xC0000000)), stubldr_code, sizeof(stubldr_code));
+	DCFlushRange((void*)(0xA0000000 + (stubldr_kaddr - 0xC0000000)), sizeof(stubldr_code));
+	ICInvalidateRange((void*)(0xA0000000 + (stubldr_kaddr - 0xC0000000)), sizeof(stubldr_code));
 
-	/* Infinite loop */
-	while(1);
-}
+	/* Make syscall 0x4f00 the stub loader, and start it */
+	kern_write(KERN_SYSCALL_TBL + 0x4f, stubldr_kaddr);
+	asm(
+		"li 0,0x4f00\n"
+		"sc\n"
+		);
 
-/* Start the stub loader */
-void start_stubldr(int argc, void *arg)
-{
 	/* Infinite loop */
 	while(1);
 }
@@ -83,4 +86,27 @@ void *memcpy(void* dst, const void* src, uint32_t size)
 	for (i = 0; i < size; i++)
 		((uint8_t*) dst)[i] = ((const uint8_t*) src)[i];
 	return dst;
+}
+
+/* Chadderz's kernel write function */
+void kern_write(void *addr, uint32_t value)
+{
+	asm(
+		"li 3,1\n"
+		"li 4,0\n"
+		"mr 5,%1\n"
+		"li 6,0\n"
+		"li 7,0\n"
+		"lis 8,1\n"
+		"mr 9,%0\n"
+		"mr %1,1\n"
+		"li 0,0x3500\n"
+		"sc\n"
+		"nop\n"
+		"mr 1,%1\n"
+		:
+		:	"r"(addr), "r"(value)
+		:	"memory", "ctr", "lr", "0", "3", "4", "5", "6", "7", "8", "9", "10",
+			"11", "12"
+		);
 }
