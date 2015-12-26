@@ -1,6 +1,6 @@
 # README #
 
-This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. It does **not** allow running code in Espresso kernel-mode or provide any access to the Starbuck. We hope to implement this in the future, but the exploit is currently limited to userspace only.
+This repository contains a way to run code inside the Wii U's web browser. It provides a means to execute arbitrary code in the Cafe OS userspace on the Espresso processor. Also included is a Cafe OS kernel exploit, which runs in the Espresso's user-mode. The exploits in this repository **do not** provide any access to IOSU on the Starbuck. We hope to implement this in the future, but the exploit is currently limited to Espresso only.
 
 Right now, almost all firmware versions are compatible:
 * Firmware versions 2.0.0 (first instalment of the Internet Browser) to 5.1.0 are supported by exploiting an use-after-free bug (CVE-2013-2842).
@@ -10,7 +10,7 @@ Right now, almost all firmware versions are compatible:
 
 ### What's inside? ###
 
-Inside this repository, you will find a set of tools that allow you to compile your own C code and embed it inside a webpage to be executed on the Wii U. There are also a few code examples doing certain tasks on the Wii U. Most notably, there is an RPC client which allows your Wii U to execute commands sent over the network from a Python script. **Nothing** in this repository is useful to the general public. You will only find it useful if you are a C programmer and want to explore the system by yourself.
+Inside this repository, you will find a set of tools that allow you to compile your own C code and embed it inside a webpage to be executed on the Wii U. There are also a few code examples doing certain tasks on the Wii U. Most notably, there is a Cafe OS kernel exploit, and an RPC client which allows your Wii U to execute commands sent over the network from a Python script. **Nothing** in this repository is useful to the general public. You will only find it useful if you are a C programmer and want to explore the system by yourself.
 
 ### How do I use this? ###
 
@@ -29,18 +29,18 @@ The `osscreenexamples` folder contains projects using `OSScreen` and the `loader
 
 #### Accessing the SDK libraries ####
 
-When you're writing C code on a PC, you have the standard library, a set of useful functions that you can call without caring how they work. For writing code on the Wii U, there's something similar: the SDK libraries. The SDK libraries provide access to graphics, audio, input, filesystem, and network functions. They are accessible from any application, including the web browser, which means that code running inside it using an exploit also gets access. All SDK libraries have full symbols available for every function. This means that you can get the address of any function by its library and symbol name.
+Programming the Wii U is built around the SDK libraries: a set of useful functions that provide access to graphics, audio, input, filesystem, and network functions. They are accessible from any application, including the web browser, which means that code running inside it using an exploit also gets access. All SDK libraries let you get the address of any contained function by its library and symbol name.
 
 Every SDK library is an RPL file, a modification of the ELF format. For example, `gx2.rpl` is the name of the graphics library, `vpad.rpl` is the name of the Gamepad input library, and `nsysnet.rpl` is the name of the BSD sockets library. There is also a special RPL called `coreinit.rpl`, which provides direct access to many core Cafe OS services, including memory management and threading.
 
-So how do you get the addresses of SDK functions? You could just hardcode them, obviously, but that's both lame and not portable to later exploit versions. There's a much better method available, which allows you to get symbol addresses dynamically, in the form of the `coreinit` `OSDynLoad` functions. You can access these functions by including `coreinit.h` in your C file.
+As mentioned, it is possible to get symbol addresses from SDK libraries dynamically. This is done through the `coreinit` `OSDynLoad` functions. You can access these functions by including `coreinit.h` in your C file.
 
-There are two functions involved in getting a symbol, splitting the process into two parts. The first function is `OSDynLoad_Acquire()`, which loads the RPL you specify. `OSDynLoad_Acquire()` takes two arguments: the RPL name and a pointer to an integer handle. `OSDynLoad_Acquire()` can also be used to get a handle to a library that's already loaded. The second function is `OSDynLoad_FindExport()`, which finds a symbol given a library's location. It takes four arguments: the integer handle returned by `OSDynLoad_Acquire()`, whether the symbol is data or not (usually not), the symbol name, and a pointer to where the symbol address should be stored. Here are the function prototypes:
+There are two functions involved in getting a symbol. The first function is `OSDynLoad_Acquire()`, which loads the RPL you specify. `OSDynLoad_Acquire()` takes two arguments: the RPL name and a pointer to an integer handle. It can also be used to get a handle to a library that's already loaded. The second function is `OSDynLoad_FindExport()`, which finds a symbol given a library handle. It takes four arguments: the integer handle returned by `OSDynLoad_Acquire()`, whether the symbol is data or not (usually not), the symbol name, and a pointer to where the symbol address should be stored. Here are the function prototypes:
 
 * `void OSDynLoad_Acquire(char \*rplname, unsigned int \*handle);`
 * `void OSDynLoad_FindExport(unsigned int handle, int isdata, char \*symname, void \*address);`
 
-Just as an example, let's say I wanted the `VPADRead()` symbol from `vpad.rpl`. If I have an integer called `handle`, I first call `OSDynLoad_Acquire("vpad.rpl", &handle);` to get the RPL's location. Next, if I have a function pointer for `VPADRead()` called `VPADRead`, I call `OSDynLoad_FindExport(handle, 0, "VPADRead", &VPADRead);` to retrive `VPADRead()`'s address. Simple. For more examples, look at `rpc.c`.
+For example, let's say I wanted the `VPADRead()` symbol from `vpad.rpl`. If I have an integer called `handle`, I first call `OSDynLoad_Acquire("vpad.rpl", &handle);` to get a handle to the RPL. Next, if I have a function pointer I want to put the symbol address in, called `VPADRead`, I call `OSDynLoad_FindExport(handle, 0, "VPADRead", &VPADRead);` to retrive `VPADRead()`'s address. For more samples of this, look at almost any libwiiu code example.
 
 #### RPC system ####
 
