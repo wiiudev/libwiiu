@@ -5,7 +5,7 @@ ici_stub.o:     file format elf32-powerpc
 Disassembly of section .text:
 
 00000000 <ici_stub>:
-   0:	38 60 10 40 	li      r3,4160
+   0:	38 60 10 00 	li      r3,4096
    4:	7c 60 01 24 	mtmsr   r3
    8:	4c 00 01 2c 	isync
    c:	7c 79 fa a6 	mfl2cr  r3

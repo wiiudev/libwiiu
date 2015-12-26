@@ -1,6 +1,6 @@
 ici_stub:
-	# Enable machine check exceptions and exception vectors at 0xFFFxxxxx
-	li r3, 0x1040
+	# Enable machine check exceptions and exception vectors at 0x00000xxx
+	li r3, 0x1000
 	mtmsr r3
 	isync
 	

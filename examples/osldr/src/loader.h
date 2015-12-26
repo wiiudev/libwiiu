@@ -27,8 +27,11 @@
 #error "Unsupported Wii U software version"
 #endif
 
-/* Trap CPU0 and CPU2 at the ICI handler, and start the stub loader */
+/* Trap CPU0 and CPU2 at the ICI handler, and get the new kernel loaded */
 void _start();
+
+/* Download the new kernel into MEM1 and run it */
+void kernload_net(int argc, void *arg);
 
 /* memcpy() implementation */
 void *memcpy(void* dst, const void* src, uint32_t size);
