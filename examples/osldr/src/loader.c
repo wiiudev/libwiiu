@@ -1,8 +1,5 @@
 #include "loader.h"
 
-/* Download the new kernel over Cafe OS's */
-void kern_download(int argc, void *arg);
-
 /* Trap CPU0 and CPU2 at the ICI handler, and get the new kernel loaded */
 void _start()
 {
@@ -33,25 +30,57 @@ void _start()
 	/* Make sure the kernel is mapped */
 	if (OSEffectiveToPhysical((void*)0xA0000000) != 0xC0000000) OSFatal("Kernel must be mapped as RW");
 
-	/* Patch the ICI handler to reinitialize the CPU state and wait for a flag */
+	/* Patch the ICI handler to disable caches and loop */
+	uint32_t ici_stub[] = 
+	{
+		0x38601040,		/* li      r3,4160 */
+		0x7c600124, 	/* mtmsr   r3 */
+		0x4c00012c, 	/* isync */
+		0x7c79faa6, 	/* mfl2cr  r3 */
+		0x3c807fff, 	/* lis     r4,32767 */
+		0x6084ffff, 	/* ori     r4,r4,65535 */
+		0x7c632038, 	/* and     r3,r3,r4 */
+		0x7c79fba6, 	/* mtl2cr  r3 */
+		0x7c0004ac, 	/* sync */
+		0x7c70faa6, 	/* mfspr   r3,1008  */
+		0x3c80ffff, 	/* lis     r4,-1 */
+		0x60843fff, 	/* ori     r4,r4,16383 */
+		0x7c632038, 	/* and     r3,r3,r4 */
+		0x7c70fba6, 	/* mtspr   1008,r3 */
+		0x7c0004ac, 	/* sync  */
+		0x48000000		/* b .loop  */
+	};
+	uint32_t *ici_vector = (uint32_t*)(0xA0000000 + (0xFFF00F00 - 0xC0000000));
+	memcpy(ici_vector, ici_stub, sizeof(ici_stub));
+	DCFlushRange(ici_vector, sizeof(ici_stub));
+	ICInvalidateRange(ici_vector, sizeof(ici_stub));
 
 	/* Send ICIs to CPU0 and CPU2 */
 	__KernelSendICI(3, 0, 0x050000, 0);
 	__KernelSendICI(3, 2, 0x050000, 0);
 
-	/* Create and start the kernel downloader thread */
+	/* Create and start the stub loader */
 	OSContext *thread1 = (OSContext*)OSAllocFromSystem(0x1000,8);
 	uint32_t *stack1 = (uint32_t*)OSAllocFromSystem(0x1000,0x20);
-	if (!OSCreateThread(thread1, &kern_download, 0, NULL, stack1 + 0x400, 0x1000, 0, 0x2 | 0x8)) OSFatal("Failed to create thread");
+	if (!OSCreateThread(thread1, &start_stubldr, 0, NULL, stack1 + 0x400, 0x1000, 0, 0x2 | 0x8)) OSFatal("Failed to create thread");
 	OSResumeThread(thread1);
 
 	/* Infinite loop */
 	while(1);
 }
 
-/* Download the new kernel over Cafe OS's */
-void kern_download(int argc, void *arg)
+/* Start the stub loader */
+void start_stubldr(int argc, void *arg)
 {
 	/* Infinite loop */
 	while(1);
+}
+
+/* memcpy() implementation */
+void *memcpy(void* dst, const void* src, uint32_t size)
+{
+	uint32_t i;
+	for (i = 0; i < size; i++)
+		((uint8_t*) dst)[i] = ((const uint8_t*) src)[i];
+	return dst;
 }
