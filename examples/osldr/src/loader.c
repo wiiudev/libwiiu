@@ -144,10 +144,6 @@ void kernload_net(int argc, void *arg)
 	DCFlushRange((void*)0xF4000000, bytes_written);
 	ICInvalidateRange((void*)0xF4000000, bytes_written);
 
-	char buffer[256];
-	__os_snprintf(buffer, 256, "0x%08X", bytes_written);
-	OSFatal(buffer);
-
 	/* Make the syscall handler jump to 0, and start running the kernel */
 	uint32_t sc_kaddr = 0xFFF00C00;
 	uint32_t sc_stub[4] = 
@@ -160,7 +156,25 @@ void kernload_net(int argc, void *arg)
 	memcpy((void*)(0xA0000000 + (sc_kaddr - 0xC0000000)), sc_stub, sizeof(sc_stub));
 	DCFlushRange((void*)(0xA0000000 + (sc_kaddr - 0xC0000000)), sizeof(sc_stub));
 	ICInvalidateRange((void*)(0xA0000000 + (sc_kaddr - 0xC0000000)), sizeof(sc_stub));
-	asm("sc");
+	//asm("sc");
+	uint32_t kret = kern_read((void*)0);
+
+	/* Reset syscall handler back to as it was before */
+	uint32_t orig_sc_stub[4] = 
+	{
+		0x3D80FFF0,
+		0x39601070,
+		0x500C2DB4,
+		0x7D600124
+	};
+	memcpy((void*)(0xA0000000 + (sc_kaddr - 0xC0000000)), orig_sc_stub, sizeof(orig_sc_stub));
+	DCFlushRange((void*)(0xA0000000 + (sc_kaddr - 0xC0000000)), sizeof(orig_sc_stub));
+	ICInvalidateRange((void*)(0xA0000000 + (sc_kaddr - 0xC0000000)), sizeof(orig_sc_stub));
+
+	/* Print the return value from the kernel */
+	char buffer[256];
+	__os_snprintf(buffer, 256, "Kernel returned 0x%08X", kret);
+	OSFatal(buffer);
 
 	/* Infinite loop */
 	while(1);
@@ -173,6 +187,33 @@ void *memcpy(void* dst, const void* src, uint32_t size)
 	for (i = 0; i < size; i++)
 		((uint8_t*) dst)[i] = ((const uint8_t*) src)[i];
 	return dst;
+}
+
+/* Chadderz's kernel read function */
+uint32_t kern_read(const void *addr)
+{
+	uint32_t result;
+	asm(
+		"li 3,1\n"
+		"li 4,0\n"
+		"li 5,0\n"
+		"li 6,0\n"
+		"li 7,0\n"
+		"lis 8,1\n"
+		"mr 9,%1\n"
+		"li 0,0x3400\n"
+		"mr %0,1\n"
+		"sc\n"
+		"nop\n"
+		"mr 1,%0\n"
+		"mr %0,3\n"
+		:	"=r"(result)
+		:	"b"(addr)
+		:	"memory", "ctr", "lr", "0", "3", "4", "5", "6", "7", "8", "9", "10",
+			"11", "12"
+	);
+
+	return result;
 }
 
 /* Chadderz's kernel write function */
