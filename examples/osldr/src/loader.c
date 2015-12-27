@@ -62,7 +62,7 @@ void _start()
 	/* Create and start the kernel downloader thread */
 	OSContext *thread1 = (OSContext*)OSAllocFromSystem(0x1000,8);
 	uint32_t *stack1 = (uint32_t*)OSAllocFromSystem(0x1000,0x20);
-	if (!OSCreateThread(thread1, &kernload_net, 1, "http://example.com/kernel.elf", stack1 + 0x400, 0x1000, 0, 0x2 | 0x8)) OSFatal("Failed to create thread");
+	if (!OSCreateThread(thread1, &kernload_net, 1, "http://192.168.1.153:8080/wiiuldr.bin", stack1 + 0x400, 0x1000, 0, 0x2 | 0x8)) OSFatal("Failed to create thread");
 	OSResumeThread(thread1);
 
 	/* Infinite loop */
@@ -112,7 +112,7 @@ void kernload_net(int argc, void *arg)
 	int (*curl_easy_perform)(void *handle);
 	void (*curl_easy_getinfo)(void *handle, uint32_t param, void *info);
 	OSDynLoad_FindExport(nlibcurl_handle, 0, "curl_easy_init", &curl_easy_init);
-	OSDynLoad_FindExport(nlibcurl_handle, 0, "curl_easy_cleanup", &curl_easy_init);
+	OSDynLoad_FindExport(nlibcurl_handle, 0, "curl_easy_cleanup", &curl_easy_cleanup);
 	OSDynLoad_FindExport(nlibcurl_handle, 0, "curl_easy_setopt", &curl_easy_setopt);
 	OSDynLoad_FindExport(nlibcurl_handle, 0, "curl_easy_perform", &curl_easy_perform);
 	OSDynLoad_FindExport(nlibcurl_handle, 0, "curl_easy_getinfo", &curl_easy_getinfo);
@@ -143,6 +143,10 @@ void kernload_net(int argc, void *arg)
 	/* Flush and invalidate the downloaded kernel in MEM1 */
 	DCFlushRange((void*)0xF4000000, bytes_written);
 	ICInvalidateRange((void*)0xF4000000, bytes_written);
+
+	char buffer[256];
+	__os_snprintf(buffer, 256, "0x%08X", bytes_written);
+	OSFatal(buffer);
 
 	/* Make the syscall handler jump to 0, and start running the kernel */
 	uint32_t sc_kaddr = 0xFFF00C00;
