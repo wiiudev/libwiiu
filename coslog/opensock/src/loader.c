@@ -23,12 +23,17 @@ int _start(int argc, char **argv)
 		if (*((unsigned int*)(0xA0000000 + (0xFFF00B40 - 0xC0000000))) == 1)
 		{
 			/* Socket functions */
+			int (*socket_lib_init)();
 			int (*get_socket_rm_fd)();
 			int (*socket)(int family, int type, int proto);
 			int (*connect)(int fd, struct sockaddr *addr, int addrlen);
+			OSDynLoad_FindExport(nsysnet_handle, 0, "socket_lib_init", &socket_lib_init);
 			OSDynLoad_FindExport(nsysnet_handle, 0, "get_socket_rm_fd", &get_socket_rm_fd);
 			OSDynLoad_FindExport(nsysnet_handle, 0, "socket", &socket);
 			OSDynLoad_FindExport(nsysnet_handle, 0, "connect", &connect);
+
+			/* Init the sockets library */
+			socket_lib_init();
 
 			/* Set up our socket address structure */
 			struct sockaddr sin;
