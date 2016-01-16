@@ -3,9 +3,10 @@ CFLAGS=-nostdinc -fno-builtin -c
 root:=.
 project := $(root)/src
 build	:=	$(root)/bin
-all: setup libwiiu532 libwiiu500 libwiiu410 libwiiu400 libwiiu310 libwiiu300 libwiiu210 libwiiu200
+all: setup libwiiu550 libwiiu532 libwiiu500 libwiiu410 libwiiu400 libwiiu310 libwiiu300 libwiiu210 libwiiu200
 
 setup:
+	mkdir -p $(root)/bin/550/
 	mkdir -p $(root)/bin/532/
 	mkdir -p $(root)/bin/500/
 	mkdir -p $(root)/bin/410/
@@ -14,6 +15,11 @@ setup:
 	mkdir -p $(root)/bin/300/
 	mkdir -p $(root)/bin/210/
 	mkdir -p $(root)/bin/200/
+libwiiu550:
+	$(CC) $(CFLAGS) -DVER=550  $(project)/*.c
+	#-Wa,-a,-ad
+	cp -r $(root)/*.o $(build)/550
+	rm $(root)/*.o
 libwiiu532:
 	$(CC) $(CFLAGS) -DVER=532  $(project)/*.c
 	#-Wa,-a,-ad
@@ -55,4 +61,4 @@ libwiiu200:
 	cp -r $(root)/*.o $(build)/200
 	rm $(root)/*.o
 clean:
-	rm -r $(build)/532/* $(build)/500/* $(build)/410/* $(build)/400/* $(build)/310/* $(build)/300/* $(build)/210/* $(build)/200/*
+	rm -r $(build)/550/* $(build)/532/* $(build)/500/* $(build)/410/* $(build)/400/* $(build)/310/* $(build)/300/* $(build)/210/* $(build)/200/*
