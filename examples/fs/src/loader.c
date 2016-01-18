@@ -45,7 +45,7 @@ void fs_test()
 	void (*FSInit)();
 	void (*FSShutdown)();
 	int (*FSAddClient)(void *client, int unk1);
-	int (*FSInitCmdBlock)(void *cmd);
+	void (*FSInitCmdBlock)(void *cmd);
 	int (*FSOpenDir)(void *client, void *cmd, char *path, uint32_t *dir_handle, int unk1);
 	int (*FSReadDir)(void *client, void *cmd, uint32_t dir_handle, void *buffer, int unk1);
 	OSDynLoad_FindExport(coreinit_handle, 0, "FSInit", &FSInit);
@@ -59,6 +59,9 @@ void fs_test()
 	FSShutdown();
 	FSInit();*/
 
+	/* Initialize the FS library */
+	FSInit();
+
 	/* Set up the client and command blocks */
 	void *client = MEMAllocFromDefaultHeapEx(0x1700, 0x20);
 	void *cmd = MEMAllocFromDefaultHeapEx(0xA80, 0x20);
@@ -66,17 +69,17 @@ void fs_test()
 	//((void (*)())0x101cd70)();
 	*((uint32_t*)0x10174F88) = 0;
 	//((void (*)())0x101cd70)();
-	FSAddClient(client, 0);
+	int ret = FSAddClient(client, -1);
 	//((void (*)())0x101cd70)();
 	FSInitCmdBlock(cmd);
 
 	/* Open /vol/save */
 	uint32_t dir_handle;
-	FSOpenDir(client, cmd, "/vol/save", &dir_handle, -1);
+	ret = FSOpenDir(client, cmd, "/vol/content", &dir_handle, -1);
 
-	//char buf[256];
-	//__os_snprintf(buf, 256, "Handle: 0x%08X", dir_handle);
-	//OSFatal(buf);
+	/*char buf[256];
+	__os_snprintf(buf, 256, "FSOpenDir() returned %d, handle=0x%08X", ret, dir_handle);
+	OSFatal(buf);*/
 
 	//((void (*)())0x101cd70)();
 
@@ -86,7 +89,7 @@ void fs_test()
 	{
 		/* Read the directory entry */
 		int ret = FSReadDir(client, cmd, dir_handle, buffer, -1);
-		((void (*)())0x101cd70)();
+		//((void (*)())0x101cd70)();
 		if (ret != 0) break;
 
 		/* Get the attributes, size, and name */
@@ -94,7 +97,7 @@ void fs_test()
 		uint32_t size = buffer[1];
 		char *name = (char*)&buffer[25];
 
-		((void (*)())0x101cd70)();
+		//((void (*)())0x101cd70)();
 
 		/* Print it out */
 		char buf[256];
