@@ -75,11 +75,11 @@ void fs_test()
 
 	/* Open /vol/save */
 	uint32_t dir_handle;
-	ret = FSOpenDir(client, cmd, "/vol/content", &dir_handle, -1);
+	ret = FSOpenDir(client, cmd, "/vol/storage_mlc01/usr/save/00050030/10012100/user/", &dir_handle, -1);
 
-	/*char buf[256];
+	char buf[256];
 	__os_snprintf(buf, 256, "FSOpenDir() returned %d, handle=0x%08X", ret, dir_handle);
-	OSFatal(buf);*/
+	OSFatal(buf);
 
 	//((void (*)())0x101cd70)();
 
