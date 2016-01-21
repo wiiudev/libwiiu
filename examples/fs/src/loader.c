@@ -43,21 +43,15 @@ void fs_test()
 
 	/* FS functions */
 	void (*FSInit)();
-	void (*FSShutdown)();
 	int (*FSAddClient)(void *client, int unk1);
 	void (*FSInitCmdBlock)(void *cmd);
 	int (*FSOpenDir)(void *client, void *cmd, char *path, uint32_t *dir_handle, int unk1);
 	int (*FSReadDir)(void *client, void *cmd, uint32_t dir_handle, void *buffer, int unk1);
 	OSDynLoad_FindExport(coreinit_handle, 0, "FSInit", &FSInit);
-	OSDynLoad_FindExport(coreinit_handle, 0, "FSShutdown", &FSShutdown);
 	OSDynLoad_FindExport(coreinit_handle, 0, "FSAddClient", &FSAddClient);
 	OSDynLoad_FindExport(coreinit_handle, 0, "FSInitCmdBlock", &FSInitCmdBlock);
 	OSDynLoad_FindExport(coreinit_handle, 0, "FSOpenDir", &FSOpenDir);
 	OSDynLoad_FindExport(coreinit_handle, 0, "FSReadDir", &FSReadDir);
-
-	/* Shutdown and reinitialize the FS library 
-	FSShutdown();
-	FSInit();*/
 
 	/* Initialize the FS library */
 	FSInit();
@@ -66,22 +60,17 @@ void fs_test()
 	void *client = MEMAllocFromDefaultHeapEx(0x1700, 0x20);
 	void *cmd = MEMAllocFromDefaultHeapEx(0xA80, 0x20);
 	if (!client || !cmd) OSFatal("Failed to allocate client and command block");
-	//((void (*)())0x101cd70)();
 	*((uint32_t*)0x10174F88) = 0;
-	//((void (*)())0x101cd70)();
 	int ret = FSAddClient(client, -1);
-	//((void (*)())0x101cd70)();
 	FSInitCmdBlock(cmd);
 
 	/* Open /vol/save */
 	uint32_t dir_handle;
-	ret = FSOpenDir(client, cmd, "/vol/storage_mlc01/usr/save/00050030/10012100/user/", &dir_handle, -1);
+	ret = FSOpenDir(client, cmd, "/vol/save/common", &dir_handle, -1);
 
-	char buf[256];
+	/*char buf[256];
 	__os_snprintf(buf, 256, "FSOpenDir() returned %d, handle=0x%08X", ret, dir_handle);
-	OSFatal(buf);
-
-	//((void (*)())0x101cd70)();
+	OSFatal(buf);*/
 
 	/* Start reading its directory entries */
 	uint32_t *buffer = MEMAllocFromDefaultHeapEx(0x200, 0x20);
@@ -89,15 +78,12 @@ void fs_test()
 	{
 		/* Read the directory entry */
 		int ret = FSReadDir(client, cmd, dir_handle, buffer, -1);
-		//((void (*)())0x101cd70)();
 		if (ret != 0) break;
 
 		/* Get the attributes, size, and name */
 		uint32_t attr = buffer[0];
 		uint32_t size = buffer[1];
 		char *name = (char*)&buffer[25];
-
-		//((void (*)())0x101cd70)();
 
 		/* Print it out */
 		char buf[256];
