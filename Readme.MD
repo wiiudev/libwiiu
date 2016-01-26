@@ -7,6 +7,7 @@ Right now, almost all firmware versions are compatible:
 * Firmware version 5.3.2 is supported by exploiting a memory corruption bug (CVE-2014-1300).
 * Firmware versions 5.1.1 to 5.3.1 are also supported, but currently unimplemented.
 * Firmware version 5.4.0 is not supported yet.
+* Firmware version 5.5.0/5.5.1 are supported, but only userland.
 
 ### What's inside? ###
 
@@ -26,6 +27,9 @@ This repository contains a C build system, which allows you to compile your own 
 The `osscreenexamples` folder contains projects using `OSScreen` and the `loader.c` from `libwiiu`. The `examples` folder does not use `OSScreen` and uses the `loader.c` in the `projects` local directory.
 * `python build.py <project path>`
 * `python build.py osscreenexamples/template`
+
+If you want to build for 5.5.0/5.5.1, you first have to compile libwiiu for 5.5.0/5.5.1. For that you go into `libwiiu` and run `make`.
+Now you can go into the `osscreenexamples` or `examples` folder and run one of the makefiles. The now compiled `code550.bin` in the `bin` folder can be used with Browserhax. Please note that not all examples may work with 5.5.0/5.5.1.
 
 #### Accessing the SDK libraries ####
 

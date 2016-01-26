@@ -33,6 +33,11 @@
 #define OSDynLoad_FindExport ((void (*)(unsigned int handle, int isdata, char *symbol, void *address))0x102b790)
 #define OSFatal ((void (*)(char* msg))0x1031368)
 #define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x102f09c)
+#elif VER==550
+#define OSDynLoad_Acquire ((void (*)(char* rpl, unsigned int *handle))0x0102A3B4)
+#define OSDynLoad_FindExport ((void (*)(unsigned int handle, int isdata, char *symbol, void *address))0x0102B828)
+#define OSFatal ((void (*)(char* msg))0x01031618)
+#define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x0102F160)
 #else
 #error "Unsupported Wii U software version"
 #endif
