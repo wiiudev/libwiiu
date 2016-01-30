@@ -19,6 +19,9 @@
 #define BUTTON_MINUS    0x0004
 #define BUTTON_HOME     0x0002
 #define BUTTON_SYNC     0x0001
+#define BUTTON_STICK_R  0x00020000
+#define BUTTON_STICK_L  0x00040000
+#define BUTTON_TV       0x00010000
 
 typedef struct
 {
