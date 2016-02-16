@@ -1,14 +1,18 @@
-CC=powerpc-eabi-gcc
-CFLAGS=-nostdinc -fno-builtin -c
-LD=powerpc-eabi-ld
-LDFLAGS=-Ttext 1800000 --oformat binary
+PATH		:=	$(DEVKITPPC)/bin:$(PATH)
+PREFIX		=	powerpc-eabi-
+CC			=	$(PREFIX)gcc
+CFLAGS		=	-nostdinc -fno-builtin -c
+LD			=	$(PREFIX)ld
+LDFLAGS		=	-Ttext 1800000 --oformat binary
+root		:=	.
+project		:=	$(root)/src
+build		:=	$(root)/bin
 
-root:=.
-project	:=	$(root)/src
-build	:=	 $(root)/bin
 all: setup findcode532 findcode500 findcode410 findcode400 findcode310 findcode300 findcode210 findcode200
+
 setup:
 	mkdir -p $(root)/bin
+
 findcode532:
 ifeq ("$(wildcard $(build)/findcode532.bin)","")
 	# Build findcode
@@ -25,6 +29,7 @@ ifeq ("$(wildcard $(build)/findcode532.bin)","")
 
 	dd if=$(build)/findcode532.bin of=$(build)/stack532.bin obs=876 seek=1 conv=notrunc
 endif
+
 findcode500:
 ifeq ("$(wildcard $(build)/findcode500.bin)","")
 	# Build findcode
@@ -41,6 +46,7 @@ ifeq ("$(wildcard $(build)/findcode500.bin)","")
 
 	dd if=$(build)/findcode500.bin of=$(build)/stack500.bin obs=432 seek=1 conv=notrunc
 endif
+
 findcode410:
 ifeq ("$(wildcard $(build)/findcode410.bin)","")
 	# Build findcode
@@ -56,6 +62,7 @@ ifeq ("$(wildcard $(build)/findcode410.bin)","")
 	dd if=$(build)/findcode410.bin of=$(build)/findcode410.bin bs=4 obs=4 skip=6 seek=2 conv=notrunc
 	dd if=$(build)/findcode410.bin of=$(build)/stack410.bin obs=432 seek=1 conv=notrunc
 endif
+
 findcode400:
 ifeq ("$(wildcard $(build)/findcode400.bin)","")
 	# Build findcode
@@ -72,6 +79,7 @@ ifeq ("$(wildcard $(build)/findcode400.bin)","")
 	#Different on 400
 	dd if=$(build)/findcode400.bin of=$(build)/stack400.bin obs=352 seek=1 conv=notrunc
 endif
+
 findcode310:
 ifeq ("$(wildcard $(build)/findcode310.bin)","")
 	# Build findcode
@@ -88,6 +96,7 @@ ifeq ("$(wildcard $(build)/findcode310.bin)","")
 	
 	dd if=$(build)/findcode310.bin of=$(build)/stack310.bin obs=352 seek=1 conv=notrunc
 endif
+
 findcode300:
 ifeq ("$(wildcard $(build)/findcode300.bin)","")
 	# Build findcode
@@ -104,6 +113,7 @@ ifeq ("$(wildcard $(build)/findcode300.bin)","")
 	
 	dd if=$(build)/findcode300.bin of=$(build)/stack300.bin obs=352 seek=1 conv=notrunc
 endif
+
 findcode210:
 ifeq ("$(wildcard $(build)/findcode210.bin)","")
 	# Build findcode
@@ -120,6 +130,7 @@ ifeq ("$(wildcard $(build)/findcode210.bin)","")
 	
 	dd if=$(build)/findcode210.bin of=$(build)/stack210.bin obs=352 seek=1 conv=notrunc
 endif
+
 findcode200:
 ifeq ("$(wildcard $(build)/findcode200.bin)","")
 	# Build findcode
@@ -136,5 +147,6 @@ ifeq ("$(wildcard $(build)/findcode200.bin)","")
 	
 	dd if=$(build)/findcode200.bin of=$(build)/stack200.bin obs=352 seek=1 conv=notrunc
 endif
+
 clean:
 	rm -r $(build)/*
