@@ -24,7 +24,7 @@
 #define OSFatal ((void (*)(char* msg))0x0102D01C)
 #define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x0102b9ac)
 #elif VER==500
-#define OSDynLoad_Acquire ((void (*)(char* rpl, unsigned int *handle))0x01029CD8)
+#define OSDynLoad_Acquire ((void (*)(char* rpl, unsigned int *handle))0x01029F70)
 #define OSDynLoad_FindExport ((void (*)(unsigned int handle, int isdata, char *symbol, void *address))0x0102B3E4)
 #define OSFatal ((void (*)(char* msg))0x01030ECC)
 #define __os_snprintf ((int(*)(char* s, int n, const char * format, ... ))0x0102ECE0)
