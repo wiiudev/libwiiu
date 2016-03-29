@@ -1,9 +1,9 @@
 PATH		:=	$(DEVKITPPC)/bin:$(PATH)
 PREFIX		=	powerpc-eabi-
 CC			=	$(PREFIX)gcc
-CFLAGS		=	-std=gnu99 -nostdinc -fno-builtin -c
+CFLAGS		=	-std=gnu99 -nostdinc -fno-builtin -fno-toplevel-reorder -c -Os
 LD			=	$(PREFIX)ld
-LDFLAGS		=	-Ttext 1800000 --oformat binary
+LDFLAGS		=	-Ttext 1800000 --oformat binary -L$(DEVKITPPC)/lib/gcc/powerpc-eabi/4.8.2 -lgcc
 project		:=	src
 root		:=	.
 build		:=	$(root)/bin
@@ -16,61 +16,38 @@ all: setup main532 main500 main410 main400 main310 main300 main210 main200
 setup:
 	mkdir -p $(root)/bin/
 
+main540:
+	make main FIRMWARE=532
+
 main532:
-	$(CC) $(CFLAGS) -DVER=532 $(project)/*.c
-	#-Wa,-a,-ad
-	cp -r $(root)/*.o $(build)
-	rm $(root)/*.o
-	$(LD) $(LDFLAGS) -o $(build)/code532.bin $(build)/loader.o $(libs)/532/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	make main FIRMWARE=532
 
 main500:
-	$(CC) $(CFLAGS) -DVER=500 $(project)/*.c
-	#-Wa,-a,-ad
-	cp -r $(root)/*.o $(build)
-	rm $(root)/*.o
-	$(LD) $(LDFLAGS) -o $(build)/code500.bin $(build)/loader.o $(libs)/500/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	make main FIRMWARE=500
 
 main410:
-	$(CC) $(CFLAGS) -DVER=410 $(project)/*.c
-	#-Wa,-a,-ad
-	cp -r $(root)/*.o $(build)
-	rm $(root)/*.o
-	$(LD) $(LDFLAGS) -o $(build)/code410.bin $(build)/loader.o $(libs)/410/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	make main FIRMWARE=410
 
 main400:
-	$(CC) $(CFLAGS) -DVER=400 $(project)/*.c
-	#-Wa,-a,-ad
-	cp -r $(root)/*.o $(build)
-	rm $(root)/*.o
-	$(LD) $(LDFLAGS) -o $(build)/code400.bin $(build)/loader.o $(libs)/400/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	make main FIRMWARE=400
 
 main310:
-	$(CC) $(CFLAGS) -DVER=310 $(project)/*.c
-	#-Wa,-a,-ad
-	cp -r $(root)/*.o $(build)
-	rm $(root)/*.o
-	$(LD) $(LDFLAGS) -o $(build)/code310.bin $(build)/loader.o $(libs)/310/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	make main FIRMWARE=310
 
 main300:
-	$(CC) $(CFLAGS) -DVER=300 $(project)/*.c
-	#-Wa,-a,-ad
-	cp -r $(root)/*.o $(build)
-	rm $(root)/*.o
-	$(LD) $(LDFLAGS) -o $(build)/code300.bin $(build)/loader.o $(libs)/300/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	make main FIRMWARE=300
 
 main210:
-	$(CC) $(CFLAGS) -DVER=210 $(project)/*.c
-	#-Wa,-a,-ad
-	cp -r $(root)/*.o $(build)
-	rm $(root)/*.o
-	$(LD) $(LDFLAGS) -o $(build)/code210.bin $(build)/loader.o $(libs)/210/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	make main FIRMWARE=210
 
 main200:
-	$(CC) $(CFLAGS) -DVER=200 $(project)/*.c
-	#-Wa,-a,-ad
+	make main FIRMWARE=200
+
+main:
+	$(CC) $(CFLAGS) -DVER=$(FIRMWARE) $(project)/*.c
 	cp -r $(root)/*.o $(build)
 	rm $(root)/*.o
-	$(LD) $(LDFLAGS) -o $(build)/code200.bin $(build)/loader.o $(libs)/200/*.o `find $(build) -name "*.o" ! -name "loader.o"`
+	$(LD) -o $(build)/code$(FIRMWARE).bin $(build)/loader.o $(libs)/$(FIRMWARE)/*.o `find $(build) -name "*.o" ! -name "loader.o"` $(LDFLAGS)
 
 clean:
 	rm -r $(build)/*

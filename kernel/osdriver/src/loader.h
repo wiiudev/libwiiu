@@ -81,13 +81,11 @@
 
 void _start();
 
-void _entryPoint();
-
 /* Find a ROP gadget by a sequence of bytes */
 void *find_gadget(uint32_t code[], uint32_t length, uint32_t gadgets_start);
 
 /* Arbitrary read and write syscalls */
-uint32_t kern_read(const void *addr);
-void kern_write(void *addr, uint32_t value);
+uint32_t __attribute__ ((noinline)) kern_read(const void *addr);
+void __attribute__ ((noinline)) kern_write(void *addr, uint32_t value);
 
 #endif /* LOADER_H */
