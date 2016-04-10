@@ -28,10 +28,10 @@ The `osscreenexamples` folder contains projects using `OSScreen` and the `loader
 * `python build.py <project path>`
 * `python build.py osscreenexamples/template`
 
-If you want to build for 5.4.0,run any makefile of any folder,and use the `code532.bin` with [Browserhax](https://github.com/yellows8/wiiu_browserhax_fright) (who need [this](https://github.com/yellows8/wiiuhaxx_common))
+If you want to build for 5.4.0,run any makefile of any folder,and use the `code532.bin` with [Browserhax](https://github.com/yellows8/wiiu_browserhax_fright) (wich needs [this](https://github.com/yellows8/wiiuhaxx_common))
 
 If you want to build for 5.5.0/5.5.1, you first have to compile libwiiu for 5.5.0/5.5.1. For that you go into `libwiiu` and run `make`.
-Now you can go into the `osscreenexamples` or `examples` folder and run one of the makefiles. The now compiled `code550.bin` in the `bin` folder can be used with [Browserhax](https://github.com/yellows8/wiiu_browserhax_fright) (who need [this](https://github.com/yellows8/wiiuhaxx_common)). Please note that not all examples may work with 5.5.0/5.5.1.
+Now you can go into the `osscreenexamples` or `examples` folder and run one of the makefiles. The now compiled `code550.bin` in the `bin` folder can be used with [Browserhax](https://github.com/yellows8/wiiu_browserhax_fright) (wich needs [this](https://github.com/yellows8/wiiuhaxx_common)). Please note that not all examples may work with 5.5.0/5.5.1.
 
 #### Accessing the SDK libraries ####
 
