@@ -7,7 +7,7 @@ Right now, almost all firmware versions are compatible:
 * Firmware version 5.3.2 is supported by exploiting a memory corruption bug (CVE-2014-1300).
 * Firmware versions 5.1.1 to 5.3.1 are also supported, but currently unimplemented.
 * Firmware version 5.4.0 is supported.
-* Firmware version 5.5.0/5.5.1 are supported, but only userland.
+* Firmware version 5.5.0/5.5.1 are supported.
 
 ### What's inside? ###
 
