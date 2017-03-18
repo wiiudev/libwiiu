@@ -356,7 +356,7 @@ void _main()
 		exitOSScreen(coreinit_handle);
 	}
 	/* Make DRVHAX point to DRVA to ensure a clean exit */
-	kern_write((void*)(drvhax_addr + 0x48), drva_addr);
+	kern_write((void*)(drvhax_addr + 0x48), drva_addr); //drv + 0x48 = next_driver_ptr
 
 	//map (mostly unused) memory area to specific MEM2 region
 #if (VER<410) //start of region on old FWs

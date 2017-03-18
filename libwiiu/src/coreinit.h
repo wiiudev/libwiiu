@@ -70,4 +70,12 @@ typedef struct OSContext
     uint32_t srr1;
 } OSContext;
 
+typedef struct OSDriver
+{
+    char name[0x40];
+    uint32_t unk;
+    uint32_t *save_area; //0x44
+    struct OSDriver *next;
+} OSDriver;
+
 #endif /* COREINIT_H */

